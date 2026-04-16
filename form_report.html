@@ -1,0 +1,396 @@
+
+    <!-- Fonts: Sarabun -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome / Lucide Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary-blue: #1E3A8A; /* น้ำเงิน */
+            --secondary-blue: #3B82F6; /* ฟ้า */
+            --accent-yellow: #FBBF24; /* เหลือง */
+            --bg-gray: #E5E7EB; /* เทา */
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-gray);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Navigation Mockup */
+        #sidebar {
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            background: linear-gradient(180deg, var(--primary-blue) 0%, #1e40af 100%);
+            color: white;
+            z-index: 1000;
+        }
+
+        #main-content {
+            margin-left: 280px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        /* Paper UI Design */
+        .paper-sheet {
+            background-color: #ffffff;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 80px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            color: #000;
+            line-height: 2.2;
+            font-size: 16px;
+        }
+
+        /* Dotted Input Style */
+        .dotted-input {
+            border: none;
+            border-bottom: 1.5px dotted #000;
+            background: transparent;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 16px;
+            color: var(--primary-blue);
+            text-align: center;
+            padding: 0 5px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .dotted-input:focus {
+            border-bottom: 1.5px solid var(--secondary-blue);
+        }
+
+        /* Checkbox/Radio Styling */
+        input[type="radio"], input[type="checkbox"] {
+            accent-color: var(--primary-blue);
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-right: 5px;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+        
+        label { cursor: pointer; }
+
+        /* Modern Buttons */
+        .btn-modern {
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Utility */
+        .hide-section { 
+            display: none !important; 
+        }
+
+        /* Animation for show/hide */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            #sidebar { display: none; }
+            #main-content { margin-left: 0; padding: 15px; }
+            .paper-sheet { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+        <form id="formReport" onsubmit="submitForm(event)">
+            
+            <!-- ================= เริ่มหน้ากระดาษ ================= -->
+            <div class="paper-sheet relative">
+                
+                <h4 class="text-center font-bold mb-6 text-xl">แบบรายงานข้อมูลการขอรับค่าเช่าบ้าน</h4>
+                
+                <!-- ส่วนที่ 1 -->
+                <div>
+                    ๑. ชื่อ-นามสกุล <input type="text" name="fullName" class="dotted-input w-64"> (ผู้ยื่นแบบขอรับค่าเช่าบ้าน)<br>
+                    ตำแหน่ง <input type="text" name="position" class="dotted-input w-64"> 
+                    สังกัด <input type="text" name="department" class="dotted-input w-64"><br>
+                    วันที่เริ่มรับราชการ <input type="text" name="startDate" class="dotted-input w-32" placeholder="วว/ดด/ปปปป"> 
+                    จังหวัด <input type="text" name="startProvince" class="dotted-input w-48"><br>
+                    วันที่โอน/ย้าย <input type="text" name="transferDate" class="dotted-input w-32" placeholder="วว/ดด/ปปปป"> 
+                    จังหวัด <input type="text" name="transferProvince" class="dotted-input w-48"><br>
+                    โดย <label><input type="radio" name="transferReason" value="self"> ย้ายตามคำร้องขอของตนเอง</label> 
+                    <label><input type="radio" name="transferReason" value="gov"> ย้ายตามคำสั่งของทางราชการ</label>
+                </div>
+
+                <!-- ส่วนที่ 2 -->
+                <div class="mt-4">
+                    ๒. สถานภาพ <label><input type="radio" name="maritalStatus" value="single" onchange="toggleSpouseInfo(this.value)"> โสด</label> 
+                    <label><input type="radio" name="maritalStatus" value="married" onchange="toggleSpouseInfo(this.value)"> สมรส</label> 
+                    
+                    <div id="spouseSection2" class="fade-in mt-1 ml-4 bg-gray-50 p-3 rounded border border-gray-200">
+                        ชื่อ-นามสกุลคู่สมรส <input type="text" name="spouseName" class="dotted-input w-64"><br>
+                        สถานที่ทำงาน <input type="text" name="spouseWorkPlace" class="dotted-input w-[400px]"><br>
+                        สถานที่ทำงานของคู่สมรสได้ให้สิทธิเบิกค่าเช่าบ้านหรือจัดบ้านพักให้กับคู่สมรสในท้องที่ที่รับราชการหรือไม่<br>
+                        <label><input type="radio" name="spouseBenefit" value="yes"> มี</label> 
+                        <label><input type="radio" name="spouseBenefit" value="no"> ไม่มี</label>
+                    </div>
+                </div>
+
+                <!-- ส่วนที่ 3 -->
+                <div class="mt-4">
+                    ๓. การมีเคหสถานในท้องที่ที่รับราชการที่เป็นของข้าราชการและคู่สมรส<br>
+                    <label><input type="radio" name="ownHouseStatus" value="yes"> มี</label> 
+                    <label><input type="radio" name="ownHouseStatus" value="no"> ไม่มี</label><br>
+                    ที่อยู่ <input type="text" name="ownHouseAddress" class="dotted-input w-full mt-1"><br>
+                    
+                    <div class="ml-4 mt-2">
+                        <label><input type="radio" name="allowanceStatus" value="got_allowance"> ได้สิทธิเบิกค่าเช่าบ้าน</label> เดือนละ <input type="number" name="allowanceAmount" class="dotted-input w-24"> บาท<br>
+                        <label><input type="radio" name="allowanceStatus" value="no_allowance"> ไม่ได้สิทธิเบิกค่าเช่าบ้าน</label> หรือทางราชการ/หน่วยงาน<br>
+                        <label><input type="radio" name="allowanceStatus" value="gov_house_provided"> ได้จัดบ้านพักให้กับคู่สมรส</label><br>
+                        <label><input type="radio" name="allowanceStatus" value="gov_house_not_provided"> ไม่ได้จัดบ้านพักให้กับคู่สมรส</label>
+                    </div>
+                </div>
+
+                <!-- ส่วนที่ 4 -->
+                <div class="mt-4">
+                    ๔. การมีเคหสถานของบิดา/มารดา ของข้าราชการ/คู่สมรสรวมทั้งบุตรที่ยังไม่บรรลุนิติภาวะทุกแห่งในท้องที่ที่รับราชการ<br>
+                    (โปรดระบุรายละเอียด)<br>
+                    
+                    <div class="ml-4 mt-2">
+                        <label><input type="checkbox" name="hasHouse_father"> บิดาของข้าพเจ้า</label> 
+                        บ้านเลขที่ <input type="text" name="f1" class="dotted-input w-16"> 
+                        หมู่ที่ <input type="text" name="f2" class="dotted-input w-12"> 
+                        แขวง/ตำบล <input type="text" name="f3" class="dotted-input w-32"> 
+                        เขต/อำเภอ <input type="text" name="f4" class="dotted-input w-32"> 
+                        จังหวัด <input type="text" name="f5" class="dotted-input w-32"><br>
+
+                        <label><input type="checkbox" name="hasHouse_mother"> มารดาของข้าพเจ้า</label> 
+                        บ้านเลขที่ <input type="text" name="m1" class="dotted-input w-16"> 
+                        หมู่ที่ <input type="text" name="m2" class="dotted-input w-12"> 
+                        แขวง/ตำบล <input type="text" name="m3" class="dotted-input w-32"> 
+                        เขต/อำเภอ <input type="text" name="m4" class="dotted-input w-32"> 
+                        จังหวัด <input type="text" name="m5" class="dotted-input w-32"><br>
+
+                        <!-- ส่วนของคู่สมรสในข้อ 4 (ซ่อนถ้าโสด) -->
+                        <div id="spouseSection4" class="fade-in">
+                            <label><input type="checkbox" name="hasHouse_spouseFather"> บิดาของคู่สมรส</label> 
+                            บ้านเลขที่ <input type="text" name="sf1" class="dotted-input w-16"> 
+                            หมู่ที่ <input type="text" name="sf2" class="dotted-input w-12"> 
+                            แขวง/ตำบล <input type="text" name="sf3" class="dotted-input w-32"> 
+                            เขต/อำเภอ <input type="text" name="sf4" class="dotted-input w-32"> 
+                            จังหวัด <input type="text" name="sf5" class="dotted-input w-32"><br>
+
+                            <label><input type="checkbox" name="hasHouse_spouseMother"> มารดาของคู่สมรส</label> 
+                            บ้านเลขที่ <input type="text" name="sm1" class="dotted-input w-16"> 
+                            หมู่ที่ <input type="text" name="sm2" class="dotted-input w-12"> 
+                            แขวง/ตำบล <input type="text" name="sm3" class="dotted-input w-32"> 
+                            เขต/อำเภอ <input type="text" name="sm4" class="dotted-input w-32"> 
+                            จังหวัด <input type="text" name="sm5" class="dotted-input w-32"><br>
+                        </div>
+
+                        <label><input type="checkbox" name="hasHouse_child"> บุตร</label> 
+                        บ้านเลขที่ <input type="text" name="c1" class="dotted-input w-16"> 
+                        หมู่ที่ <input type="text" name="c2" class="dotted-input w-12"> 
+                        แขวง/ตำบล <input type="text" name="c3" class="dotted-input w-32"> 
+                        เขต/อำเภอ <input type="text" name="c4" class="dotted-input w-32"> 
+                        จังหวัด <input type="text" name="c5" class="dotted-input w-32">
+                    </div>
+                </div>
+
+                <!-- ส่วนที่ 5 -->
+                <div class="mt-4">
+                    ๕. โปรดใส่เครื่องหมาย / ลงในช่องสี่เหลี่ยมในข้อมูลสถานะการมีชีวิตอยู่ของบิดา/มารดาของคู่สมรสและของราชการหากภายหลังมีกรณีที่บุคคลดังกล่าวเสียชีวิตหรือสาบสูญให้แจ้งรายละเอียดวัน เดือน ปีของผู้เสียชีวิตหรือสาบสูญข้าราชการผู้ยื่นแบบขอรับค่าเช่าบ้าน<br>
+                    
+                    <div class="ml-4 mt-2">
+                        <div class="row mb-2">
+                            <div class="col-md-3">บิดาของข้าราชการ</div>
+                            <div class="col-md-9">
+                                <label><input type="radio" name="fatherLifeStatus" value="alive"> ยังมีชีวิตอยู่</label> 
+                                <label><input type="radio" name="fatherLifeStatus" value="dead"> เสียชีวิตแล้วเมื่อ</label> <input type="text" name="fatherDeathDate" class="dotted-input w-32" placeholder="วว/ดด/ปปปป">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-3">มารดาของข้าราชการ</div>
+                            <div class="col-md-9">
+                                <label><input type="radio" name="motherLifeStatus" value="alive"> ยังมีชีวิตอยู่</label> 
+                                <label><input type="radio" name="motherLifeStatus" value="dead"> เสียชีวิตแล้วเมื่อ</label> <input type="text" name="motherDeathDate" class="dotted-input w-32" placeholder="วว/ดด/ปปปป">
+                            </div>
+                        </div>
+
+                        <!-- ส่วนของคู่สมรสในข้อ 5 (ซ่อนถ้าโสด) -->
+                        <div id="spouseSection5" class="fade-in">
+                            <div class="row mb-2">
+                                <div class="col-md-3">บิดาของคู่สมรส</div>
+                                <div class="col-md-9">
+                                    <label><input type="radio" name="spouseFatherLifeStatus" value="alive"> ยังมีชีวิตอยู่</label> 
+                                    <label><input type="radio" name="spouseFatherLifeStatus" value="dead"> เสียชีวิตแล้วเมื่อ</label> <input type="text" name="spouseFatherDeathDate" class="dotted-input w-32" placeholder="วว/ดด/ปปปป">
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-3">มารดาของคู่สมรส</div>
+                                <div class="col-md-9">
+                                    <label><input type="radio" name="spouseMotherLifeStatus" value="alive"> ยังมีชีวิตอยู่</label> 
+                                    <label><input type="radio" name="spouseMotherLifeStatus" value="dead"> เสียชีวิตแล้วเมื่อ</label> <input type="text" name="spouseMotherDeathDate" class="dotted-input w-32" placeholder="วว/ดด/ปปปป">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-8 font-bold">
+                    ข้าพเจ้าขอรับรองว่าข้อมูลที่ให้ไว้เป็นความจริงทุกประการ
+                </div>
+
+                <div class="row text-center mt-8">
+                    <!-- ผู้ส่งข้อมูล -->
+                    <div class="col-md-6 border-r border-gray-300">
+                        ลงชื่อ <input type="text" name="electronicSignature" class="dotted-input w-48" placeholder="ลายมือชื่อผู้เบิก"> ผู้ส่งข้อมูล<br>
+                        (<input type="text" name="fullNameSign" class="dotted-input w-48" placeholder="<<fullName>>">)<br>
+                        ตำแหน่ง <input type="text" name="positionSign" class="dotted-input w-48" placeholder="<<position>>">
+                    </div>
+                    <!-- ผู้รับรอง -->
+                    <div class="col-md-6">
+                        ลงชื่อ <input type="text" name="approverSignature" class="dotted-input w-48" placeholder="ลายมือชื่อผู้รับรอง"><br>
+                        (<input type="text" name="approverName" class="dotted-input w-48" placeholder="ผู้รับรองรายงานข้อมูล">)<br>
+                        ตำแหน่ง <input type="text" name="approverPosition" class="dotted-input w-48">
+                    </div>
+                </div>
+
+                <hr class="my-8 border-gray-300">
+
+                <!-- หมายเหตุ -->
+                <div class="text-sm text-gray-700">
+                    <strong>หมายเหตุ:</strong> ตามระเบียบกระทรวงการคลังว่าด้วยหลักเกณฑ์และวิธีการเกี่ยวกับการเบิกจ่ายเงินค่าเช่าบ้านข้าราชการ(ฉบับที่ ๒)  พ.ศ. ๒๕๕๒   
+                </div>
+
+            </div>
+            <!-- ================= สิ้นสุดหน้ากระดาษ ================= -->
+
+            <!-- Submit Button -->
+            <div class="text-center mt-6 mb-10">
+                <button type="submit" class="btn btn-success text-white btn-modern w-64 text-lg">
+                    <i class="fa-solid fa-save mr-2"></i> บันทึกข้อมูลแบบรายงาน
+                </button>
+            </div>
+
+        </form>
+    </main>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // --- 1. Logic จัดการฟอร์มแบบ Dynamic (Show/Hide คู่สมรส) ---
+        function toggleSpouseInfo(status) {
+            const sec2 = document.getElementById('spouseSection2');
+            const sec4 = document.getElementById('spouseSection4');
+            const sec5 = document.getElementById('spouseSection5');
+
+            if (status === 'single') {
+                sec2.classList.add('hide-section');
+                sec4.classList.add('hide-section');
+                sec5.classList.add('hide-section');
+                
+                // Clear values when hidden (optional UX improvement)
+                sec2.querySelectorAll('input[type="text"]').forEach(input => input.value = '');
+                sec2.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+            } else if (status === 'married') {
+                sec2.classList.remove('hide-section');
+                sec4.classList.remove('hide-section');
+                sec5.classList.remove('hide-section');
+            }
+        }
+
+        // --- 2. Submit logic ด้วย e.preventDefault() ---
+        function submitForm(e) {
+            e.preventDefault(); // กฎเหล็ก: ป้องกันการโหลดหน้าใหม่
+
+            // Validate เบื้องต้นว่าเลือกสถานภาพหรือยัง
+            const maritalStatus = document.querySelector('input[name="maritalStatus"]:checked');
+            if(!maritalStatus) {
+                Swal.fire('แจ้งเตือน', 'กรุณาระบุสถานภาพ (ข้อ ๒) ก่อนทำการบันทึก', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: 'ตรวจสอบความถูกต้อง',
+                text: "ยืนยันการบันทึกข้อมูลแบบรายงานการขอรับค่าเช่าบ้าน?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10B981', // สีเขียว Success
+                cancelButtonColor: '#6B7280',
+                confirmButtonText: 'ยืนยันบันทึก',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    
+                    // ดึงข้อมูลฟอร์ม
+                    let formElement = document.getElementById('formReport');
+                    let formData = new FormData(formElement);
+                    let formObject = {};
+                    
+                    // แปลงเป็น Object (JSON key-value)
+                    formData.forEach((value, key) => {
+                        // ถ้าเป็นข้อมูลเกี่ยวกับคู่สมรส แต่เลือกโสด ไม่ต้องนำเข้า Object ก็ได้ (Clean data)
+                        if (maritalStatus.value === 'single') {
+                            const spouseFields = ['spouseName', 'spouseWorkPlace', 'spouseBenefit', 'hasHouse_spouseFather', 'hasHouse_spouseMother', 'sf1', 'sf2', 'sf3', 'sf4', 'sf5', 'sm1', 'sm2', 'sm3', 'sm4', 'sm5', 'spouseFatherLifeStatus', 'spouseFatherDeathDate', 'spouseMotherLifeStatus', 'spouseMotherDeathDate'];
+                            if (spouseFields.includes(key)) return; 
+                        }
+
+                        if(!Reflect.has(formObject, key)){
+                            formObject[key] = value;
+                            return;
+                        }
+                        // Handle multiple checkboxes with same name (if any)
+                        if(!Array.isArray(formObject[key])){
+                            formObject[key] = [formObject[key]];
+                        }
+                        formObject[key].push(value);
+                    });
+
+                    // กฎเหล็ก: แสดงข้อมูลทั้งหมดใน console.log()
+                    console.log("========== ข้อมูลแบบรายงาน (JSON Object) ==========");
+                    console.log(JSON.stringify(formObject, null, 2));
+                    console.log("==================================================");
+
+                    Swal.fire(
+                        'บันทึกสำเร็จ!',
+                        'ข้อมูลของคุณถูกแปลงเป็น JSON (เช็คได้ที่ Console.log)',
+                        'success'
+                    );
+                }
+            });
+        }
+    </script>
+</body>
+</html>
