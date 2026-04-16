@@ -1,0 +1,609 @@
+
+    <!-- Fonts: Sarabun -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome / Lucide Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary-blue: #1E3A8A; /* น้ำเงิน */
+            --secondary-blue: #3B82F6; /* ฟ้า */
+            --accent-yellow: #FBBF24; /* เหลือง */
+            --bg-gray: #F3F4F6; /* เทาอ่อนสำหรับ Dashboard */
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-gray);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styling */
+        #sidebar {
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            background: linear-gradient(180deg, var(--primary-blue) 0%, #1e40af 100%);
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            margin: 4px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #BFDBFE; /* blue-200 */
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: var(--accent-yellow);
+            transform: translateX(5px);
+        }
+
+        /* Main Content */
+        #main-content {
+            margin-left: 280px;
+            padding: 20px 30px;
+            min-height: 100vh;
+        }
+
+        /* Top Header */
+        .top-header {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Cards & Containers */
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            border: 1px solid #E5E7EB;
+        }
+
+        .hide-section { display: none !important; }
+
+        /* Custom Scrollbar for tables */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+        .table-responsive::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        /* Folder UI */
+        .folder-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .folder-card:hover {
+            border-color: var(--secondary-blue);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.15);
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 768px) {
+            #sidebar { display: none; }
+            #main-content { margin-left: 0; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="shadow-xl">
+        <div class="p-5 text-center border-b border-blue-800">
+            <div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center mb-2 shadow-lg">
+                <i class="fa-solid fa-building-columns text-3xl text-blue-900"></i>
+            </div>
+            <h5 class="text-yellow-400 font-bold text-base">ระบบเบิกจ่ายค่าเช่าบ้าน</h5>
+        </div>
+        
+        <div class="mt-4">
+            <div class="text-xs text-blue-300 ml-6 mt-2 mb-2 uppercase font-bold">เมนูหลัก (ผู้ใช้ทั่วไป)</div>
+            <div class="nav-item" onclick="navigate('req-all')">
+                <i class="fa-solid fa-list-ul w-5"></i> คำขอเบิกเงินทั้งหมด
+            </div>
+
+            <div class="text-xs text-blue-300 ml-6 mt-4 mb-2 uppercase font-bold">เจ้าหน้าที่การเงินหน่วยงาน</div>
+            <div class="nav-item" onclick="navigate('budget-control')">
+                <i class="fa-solid fa-chart-pie w-5"></i> คุมเงินงบประมาณหน่วยงาน
+            </div>
+
+            <div class="text-xs text-blue-300 ml-6 mt-4 mb-2 uppercase font-bold">เจ้าหน้าที่กลุ่มตรวจจ่าย</div>
+            <div class="nav-item active" onclick="navigate('verify-req')">
+                <i class="fa-solid fa-clipboard-check w-5"></i> ตรวจสอบคำขอเบิกเงิน
+            </div>
+
+            <div class="text-xs text-blue-300 ml-6 mt-4 mb-2 uppercase font-bold">เจ้าหน้าที่กลุ่มบัญชี</div>
+            <div class="nav-item" onclick="navigate('gfmis-budget')">
+                <i class="fa-solid fa-file-invoice-dollar w-5"></i> การเบิกจ่ายงบประมาณ (GFMIS)
+            </div>
+            <div class="nav-item" onclick="navigate('personal-files')">
+                <i class="fa-solid fa-folder-tree w-5"></i> จัดเก็บ & แฟ้มบุคคล
+            </div>
+            <div class="nav-item" onclick="navigate('registry')">
+                <i class="fa-solid fa-address-book w-5"></i> ทะเบียนคุมรายบุคคล
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="flex items-center gap-3">
+                <h4 class="m-0 text-blue-900 font-bold" id="page-title">ตรวจสอบคำขอเบิกเงินค่าเช่าบ้าน</h4>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative cursor-pointer hover:text-blue-600 transition">
+                    <i class="fa-regular fa-bell text-xl"></i>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">5</span>
+                </div>
+                <div class="flex items-center gap-2 cursor-pointer bg-blue-50 py-1 px-3 rounded-full border border-blue-100">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=1E3A8A&color=fff" class="w-8 h-8 rounded-full">
+                    <span class="text-sm font-semibold text-blue-900">เจ้าหน้าที่ระบบ</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ================= CONTAINER FOR PAGES ================= -->
+        <div id="pages-container">
+
+            <!-- PAGE 1: คำขอเบิกเงินทั้งหมด -->
+            <section id="page-req-all" class="page-section hide-section">
+                <!-- ตัวกรองข้อมูล -->
+                <div class="dashboard-card mb-4">
+                    <h6 class="font-bold text-blue-900 mb-3"><i class="fa-solid fa-filter text-yellow-500"></i> ตัวกรองข้อมูลรายการ</h6>
+                    <div class="row g-3">
+                        <div class="col-md-2"><select class="form-select form-select-sm"><option>ปีงบประมาณ</option><option>2567</option><option>2566</option></select></div>
+                        <div class="col-md-2"><select class="form-select form-select-sm"><option>ประเภทสิทธิ</option><option>เช่าบ้าน</option><option>เช่าซื้อ/กู้ยืม</option></select></div>
+                        <div class="col-md-2"><select class="form-select form-select-sm"><option>ประเภทคำขอ</option><option>ขอรับสิทธิ (6005)</option><option>ขอเบิกเงิน (6006)</option></select></div>
+                        <div class="col-md-2"><select class="form-select form-select-sm"><option>เดือน</option><option>มกราคม</option><option>กุมภาพันธ์</option></select></div>
+                        <div class="col-md-2"><select class="form-select form-select-sm"><option>กลุ่ม/ฝ่าย</option><option>บริหารทั่วไป</option><option>การคลัง</option></select></div>
+                        <div class="col-md-2"><input type="text" class="form-control form-control-sm" placeholder="ค้นหาชื่อผู้ใช้สิทธิ..."></div>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill px-4">ล้างตัวกรอง</button>
+                        <button class="btn btn-sm btn-primary bg-blue-600 rounded-pill px-4">ค้นหา</button>
+                    </div>
+                </div>
+
+                <!-- ตารางข้อมูล (ดึงจาก Sheet) -->
+                <div class="dashboard-card">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle text-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>เลขที่คำขอ</th><th>ชื่อ-สกุล</th><th>เดือนที่เบิก</th><th>ประเภทสิทธิ</th><th>จำนวนเงิน (บาท)</th><th>สถานะ</th><th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>REQ-FMD2567-W0001</td><td>นายสมชาย รักเรียน</td><td>ม.ค. 2567</td><td>เช่าบ้าน</td><td class="text-end">4,500.00</td>
+                                    <td><span class="badge bg-success rounded-pill">อนุมัติแล้ว</span></td>
+                                    <td><button class="btn btn-sm btn-outline-primary rounded-pill"><i class="fa-solid fa-eye"></i> ดูข้อมูล</button></td>
+                                </tr>
+                                <tr>
+                                    <td>REQ-FMD2567-W0002</td><td>นางสาวสมศรี ใจดี</td><td>ม.ค. 2567</td><td>เช่าซื้อ</td><td class="text-end">5,000.00</td>
+                                    <td><span class="badge bg-warning text-dark rounded-pill">รอตรวจสอบ</span></td>
+                                    <td><button class="btn btn-sm btn-outline-primary rounded-pill"><i class="fa-solid fa-eye"></i> ดูข้อมูล</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 2: คุมเงินงบประมาณหน่วยงาน (เจ้าหน้าที่การเงิน) -->
+            <section id="page-budget-control" class="page-section hide-section">
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="dashboard-card bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+                            <p class="mb-1 text-blue-200">งบประมาณประจำปี (หน่วยงาน)</p>
+                            <h3 class="font-bold m-0">1,500,000.00 ฿</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="dashboard-card bg-gradient-to-r from-yellow-400 to-yellow-500 text-white">
+                            <p class="mb-1 text-yellow-100">ยอดขอเบิกสะสม</p>
+                            <h3 class="font-bold m-0">250,000.00 ฿</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="dashboard-card bg-gradient-to-r from-green-500 to-green-600 text-white">
+                            <p class="mb-1 text-green-100">งบประมาณคงเหลือ</p>
+                            <h3 class="font-bold m-0">1,250,000.00 ฿</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <h6 class="font-bold text-blue-900 mb-3">รายการตัดเงินงบประมาณจากหน่วยงาน</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle text-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>วันที่เบิก</th><th>ผู้ขอเบิก</th><th>กิจกรรม/หน่วยงาน</th><th>เดือนที่ขอเบิก</th><th>จำนวนเงิน (บาท)</th><th>งบประมาณคงเหลือ (บาท)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>15/01/2567</td><td>นายสมชาย รักเรียน</td><td>กองบริหารการคลัง</td><td>ม.ค. 2567</td><td class="text-end text-danger">-4,500.00</td><td class="text-end font-bold">1,245,500.00</td>
+                                </tr>
+                                <tr>
+                                    <td>15/01/2567</td><td>นางสาวสมศรี ใจดี</td><td>กองบริหารการคลัง</td><td>ม.ค. 2567</td><td class="text-end text-danger">-5,000.00</td><td class="text-end font-bold">1,240,500.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 3: ตรวจสอบคำขอเบิกเงินค่าเช่าบ้าน (เจ้าหน้าที่กลุ่มตรวจจ่าย) -->
+            <section id="page-verify-req" class="page-section">
+                <div class="row">
+                    <!-- รายละเอียดคำขอ -->
+                    <div class="col-md-8">
+                        <div class="dashboard-card mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4 border-b pb-3">
+                                <h6 class="font-bold text-blue-900 m-0"><i class="fa-solid fa-file-signature text-yellow-500"></i> รายละเอียดคำขอเบิกเงิน (6006)</h6>
+                                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">สถานะ: รอการตรวจสอบ</span>
+                            </div>
+                            
+                            <div class="row text-sm mb-3">
+                                <div class="col-4 text-gray-500 text-end">เลขที่คำขอ :</div><div class="col-8 font-bold text-blue-700">REQ-FMD2567-W0045</div>
+                                <div class="col-4 text-gray-500 text-end">ชื่อผู้ขอเบิก :</div><div class="col-8 font-bold">นายประหยัด ออมสิน</div>
+                                <div class="col-4 text-gray-500 text-end">ประจำเดือน :</div><div class="col-8">กุมภาพันธ์ 2567</div>
+                                <div class="col-4 text-gray-500 text-end">ประเภทการเบิก :</div><div class="col-8">ค่าผ่อนชำระเงินกู้เพื่อซื้อบ้าน</div>
+                                <div class="col-4 text-gray-500 text-end">จำนวนเงินที่ขอเบิก :</div><div class="col-8 font-bold text-green-600 text-lg">5,500.00 บาท</div>
+                                <div class="col-4 text-gray-500 text-end">อ้างอิงเลขที่อนุมัติ 6005 :</div><div class="col-8 text-blue-600 underline cursor-pointer">001/2567 (ดูเอกสาร)</div>
+                            </div>
+                            
+                            <hr class="my-4">
+                            
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-center gap-3">
+                                <button class="btn btn-outline-danger rounded-pill px-4 py-2" onclick="rejectRequest()">
+                                    <i class="fa-solid fa-times-circle"></i> ส่งกลับแก้ไข
+                                </button>
+                                <button class="btn btn-success rounded-pill px-4 py-2 bg-green-600 border-0" onclick="approveRequest()">
+                                    <i class="fa-solid fa-check-circle"></i> ผ่านการตรวจสอบ > ยืนยัน
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- เอกสารแนบ -->
+                    <div class="col-md-4">
+                        <div class="dashboard-card bg-gray-50">
+                            <h6 class="font-bold text-blue-900 mb-3"><i class="fa-solid fa-paperclip"></i> เอกสารแนบ</h6>
+                            <ul class="list-group list-group-flush text-sm rounded">
+                                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 cursor-pointer hover:text-blue-600">
+                                    <span><i class="fa-regular fa-file-pdf text-red-500"></i> แบบขอเบิก 6006.pdf</span>
+                                    <i class="fa-solid fa-download text-gray-400"></i>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 cursor-pointer hover:text-blue-600">
+                                    <span><i class="fa-regular fa-image text-blue-500"></i> ใบเสร็จรับเงิน_กพ67.jpg</span>
+                                    <i class="fa-solid fa-download text-gray-400"></i>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 cursor-pointer hover:text-blue-600">
+                                    <span><i class="fa-regular fa-file-pdf text-red-500"></i> สลิปเงินเดือน.pdf</span>
+                                    <i class="fa-solid fa-download text-gray-400"></i>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 4: การเบิกจ่ายงบประมาณ GFMIS (เจ้าหน้าที่กลุ่มบัญชี) -->
+            <section id="page-gfmis-budget" class="page-section hide-section">
+                <div class="dashboard-card mb-4 border-l-4 border-blue-600">
+                    <h6 class="font-bold text-blue-900 mb-2">เชื่อมโยงระบบ GFMIS</h6>
+                    <p class="text-sm text-gray-500 mb-4">นำเข้าไฟล์ Excel หรือ CSV เพื่ออัปเดตข้อมูลงบประมาณคงเหลือของหน่วยงาน (ระบบจะหักยอดรวมอัตโนมัติ)</p>
+                    
+                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center bg-gray-50 cursor-pointer hover:bg-blue-50 transition" onclick="document.getElementById('gfmisFile').click()">
+                        <i class="fa-solid fa-cloud-arrow-up text-4xl text-blue-400 mb-3"></i>
+                        <h6 class="font-bold text-blue-800">คลิกเพื่ออัปโหลดไฟล์ CSV / Excel</h6>
+                        <span class="text-xs text-gray-500">รองรับไฟล์ .csv, .xlsx</span>
+                        <input type="file" id="gfmisFile" class="hidden" accept=".csv, .xlsx" onchange="simulateGFMISUpload()">
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="font-bold text-blue-900 m-0">สถานะงบประมาณหน่วยงาน (ภาพรวม)</h6>
+                        <button class="btn btn-sm btn-warning rounded-pill" onclick="addExtraBudget()">
+                            <i class="fa-solid fa-plus"></i> เพิ่มเงินจัดสรรงบประมาณ
+                        </button>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle text-sm text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>หน่วยงาน</th><th>ปีงบประมาณ</th><th>งบที่ได้รับจัดสรร (บาท)</th><th>เบิกจ่ายรวม (บาท)</th><th class="bg-blue-50 text-blue-800 font-bold">งบประมาณคงเหลือ (บาท)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-start">กองบริหารการคลัง</td><td>2567</td><td class="text-end">1,500,000.00</td><td class="text-end text-danger">250,000.00</td><td class="text-end font-bold text-blue-700 bg-blue-50">1,250,000.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-start">สถาบันวิจัยพืชสวน</td><td>2567</td><td class="text-end">800,000.00</td><td class="text-end text-danger">150,000.00</td><td class="text-end font-bold text-blue-700 bg-blue-50">650,000.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 5: แฟ้มบุคคล & จัดเก็บ (เจ้าหน้าที่กลุ่มบัญชี) -->
+            <section id="page-personal-files" class="page-section hide-section">
+                <!-- Tabs สำหรับเลือกดูคลัง -->
+                <ul class="nav nav-pills mb-4 gap-2">
+                    <li class="nav-item m-0 p-0"><a class="nav-link active rounded-pill px-4" data-bs-toggle="pill" href="#tab-rent">คลังเช่าบ้าน</a></li>
+                    <li class="nav-item m-0 p-0"><a class="nav-link bg-white text-dark rounded-pill px-4 border" data-bs-toggle="pill" href="#tab-buy">คลังเช่าซื้อ</a></li>
+                    <li class="nav-item m-0 p-0"><a class="nav-link bg-white text-dark rounded-pill px-4 border" data-bs-toggle="pill" href="#tab-loan">คลังผ่อนชำระเงินกู้</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="tab-rent">
+                        <div class="row g-4">
+                            <!-- จำลอง Folder บุคคล -->
+                            <div class="col-md-3 col-sm-6">
+                                <div class="folder-card" onclick="openPersonalFile('นายสมชาย รักเรียน', 'เช่าบ้าน')">
+                                    <i class="fa-solid fa-folder text-5xl text-yellow-400 mb-3"></i>
+                                    <h6 class="font-bold text-blue-900 m-0">นายสมชาย รักเรียน</h6>
+                                    <span class="text-xs text-gray-500">นักวิชาการเกษตรชำนาญการ</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="folder-card" onclick="openPersonalFile('นางสาวดวงใจ ดีเสมอ', 'เช่าบ้าน')">
+                                    <i class="fa-solid fa-folder text-5xl text-yellow-400 mb-3"></i>
+                                    <h6 class="font-bold text-blue-900 m-0">นางสาวดวงใจ ดีเสมอ</h6>
+                                    <span class="text-xs text-gray-500">เจ้าพนักงานการเงิน</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 6: ทะเบียนคุมรายบุคคล -->
+            <section id="page-registry" class="page-section hide-section">
+                <div class="dashboard-card">
+                    <h6 class="font-bold text-blue-900 mb-4"><i class="fa-solid fa-address-book text-yellow-500"></i> ทะเบียนการเบิกจ่ายเงินค่าเช่าบ้านข้าราชการ (รายบุคคล)</h6>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <select class="form-select form-select-sm"><option>เลือกรายชื่อผู้ใช้สิทธิ...</option><option selected>นายสมชาย รักเรียน</option></select>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-4">
+                        <div class="row text-sm">
+                            <div class="col-md-4 mb-2"><b>ชื่อ-สกุล:</b> นายสมชาย รักเรียน</div>
+                            <div class="col-md-4 mb-2"><b>ตำแหน่ง:</b> นักวิชาการเกษตร</div>
+                            <div class="col-md-4 mb-2"><b>ประเภทสิทธิ:</b> เช่าบ้าน</div>
+                            <div class="col-md-4 mb-2"><b>อ้างอิงแบบ 6005 เลขที่:</b> 001/2567</div>
+                            <div class="col-md-4 mb-2"><b>สิทธิเบิกสูงสุด:</b> 4,500 บาท/เดือน</div>
+                            <div class="col-md-4 mb-2"><b>สถานะสิทธิ:</b> <span class="text-green-600 font-bold">ใช้สิทธิ</span></div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle text-sm text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ปีงบประมาณ</th><th>เดือนที่เบิก</th><th>วันที่อนุมัติเบิก</th><th>จำนวนเงิน (บาท)</th><th>หลักฐานเอกสาร</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2567</td><td>ตุลาคม</td><td>15/10/2566</td><td class="text-end">4,500.00</td>
+                                    <td><button class="btn btn-sm btn-outline-primary py-0"><i class="fa-solid fa-download"></i> แบบ 6006</button></td>
+                                </tr>
+                                <tr>
+                                    <td>2567</td><td>พฤศจิกายน</td><td>15/11/2566</td><td class="text-end">4,500.00</td>
+                                    <td><button class="btn btn-sm btn-outline-primary py-0"><i class="fa-solid fa-download"></i> แบบ 6006</button></td>
+                                </tr>
+                            </tbody>
+                            <tfoot class="table-light font-bold">
+                                <tr>
+                                    <td colspan="3" class="text-end">รวมเบิกจ่ายปีงบประมาณ 2567</td><td class="text-end text-blue-700">9,000.00</td><td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div> <!-- End pages container -->
+    </main>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // --- 1. SPA Navigation Logic ---
+        function navigate(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(el => el.classList.add('hide-section'));
+            // Remove active class from nav
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            // Show target page
+            document.getElementById('page-' + pageId).classList.remove('hide-section');
+            // Add active class to clicked nav
+            event.currentTarget.classList.add('active');
+            
+            // Set Header Title
+            const titles = {
+                'req-all': 'คำขอเบิกเงินทั้งหมด',
+                'budget-control': 'คุมเงินงบประมาณหน่วยงาน',
+                'verify-req': 'ตรวจสอบคำขอเบิกเงิน (กลุ่มตรวจจ่าย)',
+                'gfmis-budget': 'การเบิกจ่ายงบประมาณ (เชื่อมโยง GFMIS)',
+                'personal-files': 'จัดเก็บ & แฟ้มบุคคล (Personal Files)',
+                'registry': 'ทะเบียนการเบิกจ่าย (รายบุคคล)'
+            };
+            document.getElementById('page-title').innerText = titles[pageId] || '';
+        }
+
+        // --- 2. Logic ตรวจสอบคำขอ (ผ่าน / แก้ไข) ---
+        function approveRequest() {
+            Swal.fire({
+                title: 'ยืนยันการอนุมัติ',
+                text: "เอกสารและคำขอถูกต้องครบถ้วนใช่หรือไม่?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10B981',
+                cancelButtonColor: '#6B7280',
+                confirmButtonText: 'ใช่, ผ่านการตรวจสอบ'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire('สำเร็จ', 'บันทึกผ่านการตรวจสอบเรียบร้อยแล้ว ระบบจะส่งต่อไปยังกลุ่มบัญชี', 'success');
+                    // ปิดงานหน้านี้ จำลองซ่อนไป
+                }
+            });
+        }
+
+        function rejectRequest() {
+            Swal.fire({
+                title: 'ส่งกลับแก้ไขคำขอ',
+                input: 'textarea',
+                inputLabel: 'ระบุรายละเอียดข้อแก้ไข / คอมเมนต์',
+                inputPlaceholder: 'เช่น เอกสารใบเสร็จไม่ชัดเจน กรุณาแนบใหม่...',
+                inputAttributes: {
+                    'aria-label': 'Type your message here'
+                },
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'ยืนยันส่งกลับ',
+                cancelButtonText: 'ยกเลิก',
+                preConfirm: (text) => {
+                    if (!text) {
+                        Swal.showValidationMessage('กรุณาระบุเหตุผลการแก้ไขด้วยครับ');
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire('ส่งกลับแล้ว', 'ระบบได้แจ้งเตือนไปยังเจ้าหน้าที่ผู้สร้างคำขอแล้ว', 'info');
+                }
+            });
+        }
+
+        // --- 3. Logic อัปโหลด GFMIS จำลอง ---
+        function simulateGFMISUpload() {
+            const fileInput = document.getElementById('gfmisFile');
+            if(fileInput.files.length > 0) {
+                let fileName = fileInput.files[0].name;
+                
+                Swal.fire({
+                    title: 'กำลังประมวลผลข้อมูล...',
+                    html: `อัปเดตจากไฟล์ <b>${fileName}</b>`,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                    }
+                }).then(() => {
+                    Swal.fire('อัปเดตสำเร็จ', 'ปรับปรุงยอดเงินงบประมาณคงเหลือของหน่วยงานเรียบร้อยแล้ว', 'success');
+                    fileInput.value = ""; // reset
+                });
+            }
+        }
+
+        // --- 4. Logic เพิ่มงบประมาณ ---
+        function addExtraBudget() {
+            Swal.fire({
+                title: 'เพิ่มเงินจัดสรรงบประมาณ',
+                html: `
+                    <select id="swal-dept" class="form-select mb-3">
+                        <option>กองบริหารการคลัง</option>
+                        <option>สถาบันวิจัยพืชสวน</option>
+                    </select>
+                    <input id="swal-amount" type="number" class="form-control" placeholder="ระบุจำนวนเงิน (บาท)">
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonColor: '#F59E0B',
+                confirmButtonText: 'เพิ่มงบประมาณ',
+                preConfirm: () => {
+                    const dept = document.getElementById('swal-dept').value;
+                    const amount = document.getElementById('swal-amount').value;
+                    if(!amount) Swal.showValidationMessage('กรุณาระบุจำนวนเงิน');
+                    return { dept: dept, amount: amount }
+                }
+            }).then((result) => {
+                if(result.isConfirmed) {
+                    // จัดรูปแบบตัวเลข (จำลอง)
+                    let formatted = Number(result.value.amount).toLocaleString('th-TH');
+                    Swal.fire('บันทึกสำเร็จ', `เพิ่มงบให้ <b>${result.value.dept}</b> จำนวน <b>${formatted} บาท</b> เรียบร้อยแล้ว`, 'success');
+                }
+            });
+        }
+
+        // --- 5. Logic เปิดแฟ้มบุคคล ---
+        function openPersonalFile(name, type) {
+            Swal.fire({
+                title: `แฟ้มบุคคล: ${name}`,
+                html: `
+                    <div class="text-left text-sm mt-3">
+                        <p><b>ประเภทสิทธิ:</b> ${type}</p>
+                        <p><b>สถานะปัจจุบัน:</b> <span class="text-green-600">ใช้สิทธิ</span></p>
+                        <p><b>ปีงบประมาณล่าสุด:</b> 2567</p>
+                        <hr class="my-2">
+                        <p class="text-gray-500">คุณต้องการนำทางไปยังทะเบียนคุมรายบุคคลของผู้นี้หรือไม่?</p>
+                    </div>
+                `,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'ดูทะเบียนคุมรายบุคคล',
+                cancelButtonText: 'ปิด'
+            }).then((result) => {
+                if(result.isConfirmed) {
+                    navigate('registry');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
