@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบขอรับสิทธิและเบิกเงินค่าเช่าบ้านข้าราชการ</title>
+
+    <!-- เรียกใช้ Library พื้นฐาน -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary-blue: #1E3A8A;
+            --accent-yellow: #FBBF24;
+            --bg-gray: #E5E7EB;
+        }
+        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg-gray); overflow-x: hidden; margin: 0; }
+        
+        /* Sidebar Styles */
+        #sidebar {
+            width: 280px; height: 100vh; position: fixed;
+            background: linear-gradient(180deg, var(--primary-blue) 0%, #1e40af 100%);
+            color: white; z-index: 1000; overflow-y: auto;
+        }
+        .nav-item {
+            padding: 12px 20px; margin: 4px 15px; border-radius: 10px;
+            cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 15px;
+            color: #BFDBFE; font-size: 15px;
+        }
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.15); color: var(--accent-yellow);
+        }
+        
+        /* Main Content Styles */
+        #main-content {
+            margin-left: 280px; padding: 20px; min-height: 100vh;
+        }
+        .page-view { display: none; } /* คลาสสำหรับซ่อนหน้าต่างที่ไม่ใช้งาน */
+        .page-view.active { display: block; animation: fadeIn 0.3s; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar รวมทุกฟังก์ชั่น -->
+    <aside id="sidebar" class="shadow-xl">
+        <div class="p-5 text-center border-b border-blue-800">
+            <div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center mb-2 shadow-lg">
+                <i class="fa-solid fa-house-user text-3xl text-blue-900"></i>
+            </div>
+            <h5 class="text-yellow-400 font-bold text-base">ระบบค่าเช่าบ้าน</h5>
+        </div>
+        
+        <div class="mt-4 pb-10">
+            <!-- เมนูผู้ขอใช้สิทธิ -->
+            <div class="text-xs text-blue-300 ml-6 mt-4 mb-2 uppercase font-bold">1. ขออนุมัติสิทธิใหม่</div>
+            <div class="nav-item active" onclick="switchPage('page_6005', this)">
+                <i class="fa-solid fa-file-invoice w-5"></i> แบบขอรับค่าเช่าบ้าน (6005)
+            </div>
+            <div class="nav-item" onclick="switchPage('page_committee', this)">
+                <i class="fa-solid fa-users w-5"></i> การรับรองของคณะกรรมการ
+            </div>
+            <div class="nav-item" onclick="switchPage('page_report', this)">
+                <i class="fa-solid fa-clipboard-list w-5"></i> แบบรายงานข้อมูล
+            </div>
+            <div class="nav-item" onclick="switchPage('page_submit_request', this)">
+                <i class="fa-solid fa-paper-plane w-5"></i> ส่งคำขออนุมัติสิทธิ
+            </div>
+
+            <!-- เมนูเบิกรายเดือน -->
+            <div class="text-xs text-blue-300 ml-6 mt-6 mb-2 uppercase font-bold">2. เบิกเงินรายเดือน</div>
+            <div class="nav-item" onclick="switchPage('page_6006', this)">
+                <i class="fa-solid fa-money-check-dollar w-5"></i> แบบขอเบิกเงิน (6006)
+            </div>
+
+            <!-- เมนูเจ้าหน้าที่ -->
+            <div class="text-xs text-blue-300 ml-6 mt-6 mb-2 uppercase font-bold">3. สำหรับเจ้าหน้าที่</div>
+            <div class="nav-item" onclick="switchPage('page_approve', this)">
+                <i class="fa-solid fa-clipboard-check w-5"></i> รายงาน / อนุมัติเบิกจ่าย
+            </div>
+            <div class="nav-item" onclick="switchPage('page_admin', this)">
+                <i class="fa-solid fa-cogs w-5"></i> จัดการระบบ (Admin)
+            </div>
+        </div>
+    </aside>
+
+    <!-- พื้นที่แสดงผลตรงกลาง (ดึงไฟล์ย่อยมาเสียบ) -->
+    <main id="main-content">
+        
+        <!-- หน้า 6005 -->
+        <div id="page_6005" class="page-view active">
+            <?!= include('form_6005'); ?>
+        </div>
+
+        <!-- หน้า คณะกรรมการ -->
+        <div id="page_committee" class="page-view">
+            <?!= include('form_committee'); ?>
+        </div>
+
+        <!-- หน้า รายงานข้อมูล -->
+        <div id="page_report" class="page-view">
+            <?!= include('form_report'); ?>
+        </div>
+
+        <!-- หน้า สรุปส่งคำขอ -->
+        <div id="page_submit_request" class="page-view">
+            <?!= include('form_submit_request'); ?>
+        </div>
+
+        <!-- หน้า 6006 -->
+        <div id="page_6006" class="page-view">
+            <?!= include('form_6006'); ?>
+        </div>
+
+        <!-- หน้า เจ้าหน้าที่รายงาน/อนุมัติ (รวมไว้ในไฟล์ report_disbursement) -->
+        <div id="page_approve" class="page-view">
+            <?!= include('report_disbursement'); ?>
+        </div>
+
+        <!-- หน้า จัดการระบบ -->
+        <div id="page_admin" class="page-view">
+            <?!= include('admin_management'); ?>
+        </div>
+
+    </main>
+
+    <!-- Javascript ควบคุมการสลับหน้าเว็บ (SPA) -->
+    <script>
+        function switchPage(pageId, element) {
+            // 1. ซ่อนทุกหน้า
+            const pages = document.querySelectorAll('.page-view');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // 2. ลบสีไฮไลท์ออกจากทุกเมนู
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(nav => nav.classList.remove('active'));
+
+            // 3. แสดงหน้าที่เลือก
+            document.getElementById(pageId).classList.add('active');
+            
+            // 4. ไฮไลท์เมนูที่ถูกคลิก
+            if(element) element.classList.add('active');
+            
+            // เลื่อนจอขึ้นบนสุดเมื่อเปลี่ยนหน้า
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
