@@ -1,0 +1,529 @@
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบขอรับค่าเช่าบ้าน (แบบ 6005)</title>
+
+    <!-- Fonts: Sarabun -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome / Lucide Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary-blue: #1E3A8A; /* น้ำเงิน */
+            --secondary-blue: #3B82F6; /* ฟ้า */
+            --accent-yellow: #FBBF24; /* เหลือง */
+            --bg-gray: #E5E7EB; /* เทา */
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-gray);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Navigation Mockup */
+        #sidebar {
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            background: linear-gradient(180deg, var(--primary-blue) 0%, #1e40af 100%);
+            color: white;
+            z-index: 1000;
+        }
+
+        #main-content {
+            margin-left: 280px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        /* Paper UI Design */
+        .paper-sheet {
+            background-color: #ffffff;
+            max-width: 900px; /* ขนาดใกล้เคียง A4 */
+            margin: 0 auto;
+            padding: 60px 80px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            color: #000;
+            line-height: 2.4; /* ระยะห่างบรรทัดเอกสารราชการ */
+            font-size: 16px;
+        }
+
+        /* Dotted Input Style */
+        .dotted-input {
+            border: none;
+            border-bottom: 1.5px dotted #000;
+            background: transparent;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 16px;
+            color: var(--primary-blue);
+            text-align: center;
+            padding: 0 5px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .dotted-input:focus {
+            border-bottom: 1.5px solid var(--secondary-blue);
+        }
+
+        .dotted-input[readonly] {
+            color: #6B7280;
+            pointer-events: none;
+        }
+
+        /* Checkbox/Radio Styling */
+        input[type="radio"], input[type="checkbox"] {
+            accent-color: var(--primary-blue);
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-right: 5px;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+        
+        label { cursor: pointer; }
+
+        /* Modern Buttons */
+        .btn-modern {
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Hide logic class */
+        .hide-section {
+            display: none !important;
+        }
+
+        /* File Upload Area */
+        .file-upload-box {
+            border: 1px dashed #9ca3af;
+            border-radius: 8px;
+            padding: 10px 15px;
+            background: #f9fafb;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar { display: none; }
+            #main-content { margin-left: 0; padding: 15px; }
+            .paper-sheet { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        
+        <div class="max-w-[900px] mx-auto mb-4">
+            <!-- ส่วนตัวเลือกฟังก์ชั่นรอง (Popup แบบ Card ด้านบน) -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border-t-4 border-yellow-400">
+                <h5 class="font-bold text-blue-900 mb-3 flex items-center gap-2">
+                    <i data-lucide="mouse-pointer-click" class="text-yellow-500"></i> เลือกประเภทการใช้สิทธิ
+                </h5>
+                <p class="text-sm text-gray-500 mb-3">กรุณาเลือกประเภท เพื่อให้ระบบแสดงฟอร์มและรายการเอกสารแนบที่ถูกต้อง</p>
+                <div class="flex flex-wrap gap-4">
+                    <label class="px-4 py-2 border rounded-full cursor-pointer hover:bg-blue-50 transition">
+                        <input type="radio" name="requestTypeSelector" value="rent" onchange="toggleFormLogic(this.value)"> 1) เช่าบ้าน
+                    </label>
+                    <label class="px-4 py-2 border rounded-full cursor-pointer hover:bg-blue-50 transition">
+                        <input type="radio" name="requestTypeSelector" value="hirePurchase" onchange="toggleFormLogic(this.value)"> 2) เช่าซื้อ
+                    </label>
+                    <label class="px-4 py-2 border rounded-full cursor-pointer hover:bg-blue-50 transition">
+                        <input type="radio" name="requestTypeSelector" value="loan" onchange="toggleFormLogic(this.value)"> 3) ผ่อนชำระเงินกู้เพื่อซื้อบ้าน / ปลูกสร้างบ้าน
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <form id="form6005" onsubmit="submitForm(event)">
+            <!-- ================= เริ่มหน้ากระดาษ ================= -->
+            <div class="paper-sheet relative">
+                
+                <div class="text-right text-sm text-gray-600 mb-4">แบบ ๖๐๐๕</div>
+                <h4 class="text-center font-bold mb-6 text-xl">แบบขอรับค่าเช่าบ้าน (แบบ ๖๐๐๕ )</h4>
+                
+                <div class="text-right mb-4">
+                    เลขที่ <input type="text" name="refNo" class="dotted-input w-24" readonly placeholder="<<refNo>>" value="รอกำหนด"> / 
+                    <input type="text" name="year" class="dotted-input w-16" readonly placeholder="<<year>>" value="2567">
+                </div>
+
+                <div class="font-bold mb-2">ส่วนที่ ๑ การขอรับค่าเช่าบ้าน</div>
+                
+                <div class="text-right">
+                    เขียนที่ <input type="text" name="writtenAt" class="dotted-input w-48">
+                </div>
+                <div class="text-right mb-4">
+                    วันที่ <input type="text" name="d1" class="dotted-input w-12" placeholder="๐๑"> 
+                    เดือน <input type="text" name="m1" class="dotted-input w-32" placeholder="มกราคม"> 
+                    พ.ศ. <input type="text" name="y1" class="dotted-input w-16" placeholder="๒๕๖๗">
+                </div>
+
+                <div>
+                    ๑. ข้าพเจ้า <input type="text" name="fullName" class="dotted-input w-64"> 
+                    ตำแหน่ง <input type="text" name="position" class="dotted-input w-64"><br>
+                    ขอยื่นรับค่าเช่าบ้าน ต่อ <input type="text" name="submitTo" class="dotted-input w-64"> (ผู้อนุมัติ)
+                </div>
+
+                <div class="mt-2">
+                    ๒. ข้าพเจ้า 
+                    <label><input type="radio" name="workStatus" value="first_time"> เริ่มรับราชการและปฏิบัติงานครั้งแรก</label> 
+                    <label><input type="radio" name="workStatus" value="return_work"> กลับเข้ารับราชการและปฏิบัติงานในตำแหน่ง</label> 
+                    <input type="text" name="pastPosition" class="dotted-input w-48"><br>
+                    ท้องที่ ตำบล/แขวง <input type="text" name="pastWorkSubDistrict" class="dotted-input w-32"> 
+                    อำเภอ/เขต <input type="text" name="pastworkDistrict" class="dotted-input w-32"> 
+                    จังหวัด <input type="text" name="pastworkProvince" class="dotted-input w-32"><br>
+                    เงินเดือน <input type="number" name="salary" class="dotted-input w-32" oninput="updateBahtText(this, 'bahttextSalary')"> บาท 
+                    (<input type="text" name="bahttextSalary" class="dotted-input w-64" readonly placeholder="<<bahttextSalary>>">) <br>
+                    โดยได้รายงานตัวเมื่อวันที่ <input type="text" name="reportDay" class="dotted-input w-12"> 
+                    เดือน <input type="text" name="reportMonth" class="dotted-input w-32"> 
+                    พ.ศ. <input type="text" name="reportYear" class="dotted-input w-16">
+                </div>
+
+                <div class="mt-2">
+                    ๓. บัดนี้ 
+                    <label><input type="radio" name="orderType" value="province"> จังหวัด</label> 
+                    <label><input type="radio" name="orderType" value="department"> กรม</label> 
+                    <label><input type="radio" name="orderType" value="ministry"> กระทรวง</label> 
+                    ได้มีคำสั่งให้ข้าพเจ้ารับราชการประจำตำแหน่ง <input type="text" name="newPosition" class="dotted-input w-48"><br>
+                    ท้องที่ ตำบล/แขวง <input type="text" name="newSubDistrict" class="dotted-input w-32"> 
+                    อำเภอ/เขต <input type="text" name="newDistrict" class="dotted-input w-32"> 
+                    จังหวัด <input type="text" name="newProvince" class="dotted-input w-32"><br>
+                    โดยได้รายงานตัวเมื่อวันที่ <input type="text" name="newReportDay" class="dotted-input w-12"> 
+                    เดือน <input type="text" name="newReportMonth" class="dotted-input w-32"> 
+                    พ.ศ. <input type="text" name="newReportYear" class="dotted-input w-16">
+                </div>
+
+                <div class="mt-2">
+                    ๔. ข้าพเจ้าได้ 
+                    <label><input type="radio" name="houseStatus" value="rent_house"> เช่าบ้านพักเพื่ออยู่อาศัย</label> 
+                    <label><input type="radio" name="houseStatus" value="hire_purchase"> เช่าซื้อบ้านเพื่อที่อยู่อาศัย</label><br>
+                    บ้านเลขที่ <input type="text" name="rentHouseNo" class="dotted-input w-16"> 
+                    ซอย <input type="text" name="rentSoi" class="dotted-input w-32"> 
+                    ถนน <input type="text" name="rentRoad" class="dotted-input w-32"> <br>
+                    ตำบล/แขวง <input type="text" name="rentSubDistrict" class="dotted-input w-32"> 
+                    อำเภอ/เขต <input type="text" name="rentDistrict" class="dotted-input w-32"> 
+                    จังหวัด <input type="text" name="rentProvince" class="dotted-input w-32"><br>
+                    ตั้งแต่วันที่ <input type="text" name="rentStartDate" class="dotted-input w-32"> 
+                    ถึงวันที่ <input type="text" name="rentEndDate" class="dotted-input w-32"> <br>
+                    ตามสัญญาเช่า/สัญญาเช่าซื้อ ฉบับลงวันที่ <input type="text" name="rentContractDate" class="dotted-input w-32"><br>
+                    ชื่อเจ้าของบ้าน/ผู้ให้เช่าช่วง/ผู้ให้เช่าซื้อ <input type="text" name="landlordName" class="dotted-input w-64"><br>
+                    ในอัตราเดือนละ <input type="number" name="rentAmount" class="dotted-input w-32"> บาท
+                </div>
+
+                <!-- Section 5: กู้ยืมเงิน (จะถูกซ่อนถ้าเลือก "เช่าบ้าน" จาก Popup ด้านบน) -->
+                <div class="mt-2" id="section5">
+                    ๕. ข้าพเจ้าได้ 
+                    <label><input type="radio" name="loanPurpose" value="buy_house"> กู้ยืมเงินเพื่อซื้อบ้าน</label> 
+                    <label><input type="radio" name="loanPurpose" value="build_house"> กู้ยืมเงินเพื่อปลูกสร้างบ้าน</label><br>
+                    บ้านเลขที่ <input type="text" name="loanHouseNo" class="dotted-input w-16"> 
+                    ซอย <input type="text" name="loanSoi" class="dotted-input w-32"> 
+                    ถนน <input type="text" name="loanRoad" class="dotted-input w-32"><br>
+                    ตำบล/แขวง <input type="text" name="loanSubDistrict" class="dotted-input w-32"> 
+                    อำเภอ/เขต <input type="text" name="loanDistrict" class="dotted-input w-32"> 
+                    จังหวัด <input type="text" name="loanProvince" class="dotted-input w-32"><br>
+                    
+                    <div class="ml-6 mt-1">
+                        ๕.๑ ชื่อผู้ให้กู้ <input type="text" name="lenderName" class="dotted-input w-48"> 
+                        จำนวน <input type="number" name="loanAmount" class="dotted-input w-32" oninput="updateBahtText(this, 'bahttextLoanAmount')"> บาท <br>
+                        ชำระเงินกู้เดือนละ <input type="number" name="loanInstallment" class="dotted-input w-24"> บาท 
+                        ตั้งแต่วันที่ <input type="text" name="loanStartDate" class="dotted-input w-32"> 
+                        ถึงวันที่ <input type="text" name="loanEndDate" class="dotted-input w-32"><br>
+                        ตามสัญญากู้ยืมเงิน ฉบับลงวันที่ <input type="text" name="loanContractDate" class="dotted-input w-32"><br>
+                    </div>
+                    <div class="ml-6 mt-1">
+                        ๕.๒ ชื่อผู้ขาย/ผู้รับจ้างปลูกสร้างบ้าน <input type="text" name="contractorName" class="dotted-input w-64"><br> 
+                        ตามสัญญาซื้อขาย / สัญญาจ้าง ฉบับลงวันที่ <input type="text" name="buyContractDate" class="dotted-input w-32">
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    ข้าพเจ้าจึงขอเบิกเงินค่าเช่าบ้านพักในอัตราเดือนละ <input type="number" name="allowanceAmount" class="dotted-input w-32" oninput="updateBahtText(this, 'bahttextAllowanceAmount')"> บาท<br>
+                    (<input type="text" name="bahttextAllowanceAmount" class="dotted-input w-[400px]" readonly placeholder="<<bahttextAllowanceAmount>>">)<br>
+                    ตามพระราชกฤษฎีกาค่าเช่าบ้านข้าราชการ พ.ศ. ๒๕๔๗ ทุกประการ
+                </div>
+
+                <div class="text-center mt-8">
+                    ลงชื่อ <input type="text" name="electronicSignatureUser" class="dotted-input w-64" placeholder="ลายมือชื่ออิเล็กทรอนิกส์"><br>
+                    (<input type="text" name="fullNameSign" class="dotted-input w-64">)
+                </div>
+
+                <hr class="my-6 border-gray-400 border-2">
+
+                <!-- ส่วนที่ 2 -->
+                <div class="font-bold mb-2">ส่วนที่ ๒ การรับรอง</div>
+                <div>
+                    ข้าพเจ้าได้ตรวจสอบเอกสารต่าง ๆ แล้วเห็นว่าข้าราชการผู้นี้มีสิทธิได้รับค่าเช่าบ้านตามพระราชกฤษฎีกาค่าเช่าบ้านข้าราชการ พ.ศ. ๒๕๔๗
+                </div>
+                <div class="text-center mt-6">
+                    ลงชื่อ <input type="text" name="electronicSignatureChecker" class="dotted-input w-64" readonly placeholder="สำหรับเจ้าหน้าที่ตรวจสอบ"><br>
+                    (<input type="text" name="checkerName" class="dotted-input w-64" readonly placeholder="<<checkerName>>">)<br>
+                    ตำแหน่ง <input type="text" name="checkerPosition" class="dotted-input w-64" readonly placeholder="<<checkerPosition>>"><br>
+                    วันที่ <input type="text" class="dotted-input w-12" readonly> เดือน <input type="text" class="dotted-input w-32" readonly> พ.ศ. <input type="text" class="dotted-input w-16" readonly>
+                </div>
+
+                <hr class="my-6 border-gray-400 border-2">
+
+                <!-- ส่วนที่ 3 -->
+                <div class="font-bold mb-2">ส่วนที่ ๓ การอนุมัติ</div>
+                <div>
+                    อนุมัติให้เบิกค่าเช่าบ้านได้ 
+                    <label><input type="radio" name="approveStatus" value="by_right" disabled> ตามสิทธิ</label> 
+                    <label><input type="radio" name="approveStatus" value="by_actual" disabled> ตามที่จ่ายจริง</label> 
+                    เดือนละ <input type="text" name="allowanceAmountApprove" class="dotted-input w-24" readonly placeholder="<<allowanceAmount>>"> บาท<br>
+                    ตั้งแต่วันที่ <input type="text" class="dotted-input w-12" readonly> เดือน <input type="text" class="dotted-input w-32" readonly> พ.ศ. <input type="text" class="dotted-input w-16" readonly>
+                </div>
+                <div class="text-center mt-6">
+                    ลงชื่อ <input type="text" name="electronicSignatureCommander" class="dotted-input w-64" readonly placeholder="สำหรับผู้บังคับบัญชาลงนาม"><br>
+                    (<input type="text" name="commanderName" class="dotted-input w-64" readonly placeholder="<<commanderName>>">)<br>
+                    ตำแหน่ง <input type="text" name="commanderPosition" class="dotted-input w-64" readonly placeholder="<<commanderPosition>>"><br>
+                    วันที่ <input type="text" class="dotted-input w-12" readonly> เดือน <input type="text" class="dotted-input w-32" readonly> พ.ศ. <input type="text" class="dotted-input w-16" readonly>
+                </div>
+
+            </div>
+            <!-- ================= สิ้นสุดหน้ากระดาษ ================= -->
+
+            <!-- ================= ส่วนแนบเอกสาร (รองรับไม่เกิน 50MB) ================= -->
+            <div class="max-w-[900px] mx-auto mt-6 bg-white p-6 rounded-2xl shadow-sm border-t-4 border-blue-600">
+                <h5 class="font-bold text-blue-900 mb-3 flex items-center gap-2">
+                    <i data-lucide="paperclip"></i> แนบเอกสารแนบ <span class="text-xs text-red-500 font-normal">(ไฟล์ละไม่เกิน 50MB)</span>
+                </h5>
+
+                <!-- เอกสารกรณีเช่าบ้าน -->
+                <div id="attachmentListRent" class="row hide-section">
+                    <div class="col-md-6"><div class="file-upload-box">1. หนังสือขออนุมัติเบิกค่าเช่าบ้าน <input type="file" name="att_rent_1" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">2. คำสั่งบรรจุเริ่มรับราชการและการโอนย้าย <input type="file" name="att_rent_2" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">3. หนังสือมารายงานตัวปฏิบัติราชการในท้องที่ใหม่ <input type="file" name="att_rent_3" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">4. สำเนาทะเบียนบ้านผู้เบิกและคู่สมรส (ถ้ามี) <input type="file" name="att_rent_4" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">5. สลิปเงินเดือน นับแต่วันที่ขอใช้สิทธิ <input type="file" name="att_rent_5" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">6. สัญญาเช่าบ้าน พร้อมอากรแสตมป์ (1,000:1 บาท) <input type="file" name="att_rent_6" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">7. สำเนาโฉนดที่ดิน (แสดงกรรมสิทธิ์เจ้าของบ้าน) <input type="file" name="att_rent_7" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">8. สำเนาบัตรประจำตัวประชาชนผู้ให้เช่า <input type="file" name="att_rent_8" class="form-control form-control-sm mt-1"></div></div>
+                </div>
+
+                <!-- เอกสารกรณีเช่าซื้อ / ผ่อนชำระเงินกู้ -->
+                <div id="attachmentListLoan" class="row hide-section">
+                    <div class="col-md-6"><div class="file-upload-box">1. หนังสือขออนุมัติเบิกค่าเช่าซื้อ/ผ่อนชำระเงินกู้ <input type="file" name="att_loan_1" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">2. คำสั่งบรรจุเริ่มรับราชการและการโอนย้าย <input type="file" name="att_loan_2" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">3. หนังสือมารายงานตัวปฏิบัติราชการในท้องที่ใหม่ <input type="file" name="att_loan_3" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">4. สำเนาทะเบียนบ้านที่ผ่อนชำระและคู่สมรส (ถ้ามี) <input type="file" name="att_loan_4" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">5. สลิปเงินเดือน นับแต่วันที่ขอใช้สิทธิ <input type="file" name="att_loan_5" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">6. สำเนาสัญญาการซื้อขายบ้านและที่ดิน <input type="file" name="att_loan_6" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">7. สำเนาสัญญาการกู้เงิน และบันทึกต่อท้ายสัญญา <input type="file" name="att_loan_7" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">8. สำเนาหนังสือสัญญาจำนองที่ดิน <input type="file" name="att_loan_8" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">9. สำเนาโฉนดที่ดิน (แสดงกรรมสิทธิ์ในบ้าน) <input type="file" name="att_loan_9" class="form-control form-control-sm mt-1"></div></div>
+                    <div class="col-md-6"><div class="file-upload-box">10. สำเนาหนังสือมอบอำนาจ (กรณีมอบอำนาจ) <input type="file" name="att_loan_10" class="form-control form-control-sm mt-1"></div></div>
+                </div>
+
+                <!-- กล่องใส่เอกสารอื่นๆ -->
+                <div class="row mt-2" id="extraAttachmentsArea"></div>
+
+                <div class="mt-3">
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="addExtraAttachment()">
+                        <i class="fa-solid fa-plus"></i> เพิ่มเอกสารอื่นๆ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center mt-6 mb-10">
+                <button type="submit" class="btn btn-primary bg-blue-700 border-0 btn-modern text-white w-64 text-lg">
+                    <i class="fa-solid fa-save mr-2"></i> บันทึกข้อมูลแบบ 6005
+                </button>
+            </div>
+
+        </form>
+    </main>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // --- 1. Logic ซ่อน/แสดง ฟอร์ม ข้อ 5 และเอกสารแนบ ---
+        function toggleFormLogic(type) {
+            const section5 = document.getElementById('section5');
+            const attRent = document.getElementById('attachmentListRent');
+            const attLoan = document.getElementById('attachmentListLoan');
+
+            // Reset view
+            section5.classList.remove('hide-section');
+            attRent.classList.add('hide-section');
+            attLoan.classList.add('hide-section');
+
+            if (type === 'rent') {
+                section5.classList.add('hide-section'); // ซ่อนข้อ 5
+                attRent.classList.remove('hide-section'); // แสดงรายการเอกสารเช่า
+                
+                // ติ๊ก Radio ในเอกสารกระดาษอัตโนมัติ (Optional UX)
+                document.querySelector('input[name="houseStatus"][value="rent_house"]').checked = true;
+            } else if (type === 'hirePurchase') {
+                attLoan.classList.remove('hide-section');
+                document.querySelector('input[name="houseStatus"][value="hire_purchase"]').checked = true;
+            } else if (type === 'loan') {
+                attLoan.classList.remove('hide-section');
+            }
+        }
+
+        // --- 2. Logic เพิ่มไฟล์แนบอื่นๆ ---
+        let extraAttCount = 0;
+        function addExtraAttachment() {
+            extraAttCount++;
+            const div = document.createElement('div');
+            div.className = 'col-md-6';
+            div.innerHTML = `
+                <div class="file-upload-box flex items-center gap-2">
+                    <div class="flex-grow">
+                        <input type="text" name="extra_att_name_${extraAttCount}" class="form-control form-control-sm border-0 bg-transparent p-0 mb-1" placeholder="ระบุชื่อเอกสารอื่นๆ...">
+                        <input type="file" name="extra_att_file_${extraAttCount}" class="form-control form-control-sm">
+                    </div>
+                    <button type="button" class="btn btn-sm btn-danger rounded" onclick="this.parentElement.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `;
+            document.getElementById('extraAttachmentsArea').appendChild(div);
+        }
+
+        // --- 3. Thai Baht Text Converter ---
+        function ThaiNumberToText(amount_number) {
+            amount_number = amount_number.toString().replace(/,/g, "");
+            amount_number = parseFloat(amount_number).toFixed(2);
+            let pt = amount_number.split(".");
+            let number = pt[0];
+            let fraction = pt[1];
+            
+            if(amount_number == 0) return "ศูนย์บาทถ้วน";
+            
+            const txtNumArr = ["ศูนย์", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า", "สิบ"];
+            const txtDigitArr = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน", "ล้าน"];
+            
+            let bahtText = "";
+            let numLength = number.length;
+            for(let i=0; i<numLength; i++){
+                let tmp = parseInt(number.substring(i, i+1));
+                if(tmp != 0){
+                    if((i == (numLength-1)) && (tmp == 1) && numLength > 1) { bahtText += "เอ็ด"; }
+                    else if((i == (numLength-2)) && (tmp == 2)) { bahtText += "ยี่"; }
+                    else if((i == (numLength-2)) && (tmp == 1)) { bahtText += ""; }
+                    else { bahtText += txtNumArr[tmp]; }
+                    bahtText += txtDigitArr[numLength-i-1];
+                }
+            }
+            bahtText += "บาท";
+            
+            if(fraction == "00") {
+                bahtText += "ถ้วน";
+            } else {
+                let satangText = "";
+                let fracLength = fraction.length;
+                for(let i=0; i<fracLength; i++){
+                    let tmp = parseInt(fraction.substring(i, i+1));
+                    if(tmp != 0){
+                        if((i == (fracLength-1)) && (tmp == 1) && fraction.substring(0,1) != "0") { satangText += "เอ็ด"; }
+                        else if((i == (fracLength-2)) && (tmp == 2)) { satangText += "ยี่"; }
+                        else if((i == (fracLength-2)) && (tmp == 1)) { satangText += ""; }
+                        else { satangText += txtNumArr[tmp]; }
+                        satangText += txtDigitArr[fracLength-i-1];
+                    }
+                }
+                bahtText += satangText + "สตางค์";
+            }
+            return bahtText;
+        }
+
+        // อัพเดตข้อความบาทอัตโนมัติ
+        function updateBahtText(inputElement, targetName) {
+            let val = inputElement.value;
+            let targetElement = document.querySelector(`input[name="${targetName}"]`);
+            if(val && targetElement) {
+                targetElement.value = '- ' + ThaiNumberToText(val) + ' -';
+            } else if (targetElement) {
+                targetElement.value = "";
+            }
+        }
+
+        // --- 4. Submit logic ด้วย e.preventDefault() ---
+        function submitForm(e) {
+            e.preventDefault(); // กฎเหล็ก: ป้องกันการโหลดหน้าใหม่
+
+            // ตรวจสอบว่าเลือกประเภทหรือยัง
+            const reqType = document.querySelector('input[name="requestTypeSelector"]:checked');
+            if(!reqType) {
+                Swal.fire('ข้อผิดพลาด', 'กรุณาเลือกประเภทการใช้สิทธิ (เช่าบ้าน/เช่าซื้อ/กู้ยืม) ที่ด้านบนก่อนบันทึก', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: 'ยืนยันการตรวจสอบข้อมูล',
+                text: "ระบบจะทำการบันทึกข้อมูลแบบ 6005 ของคุณ",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#1E3A8A',
+                cancelButtonColor: '#6B7280',
+                confirmButtonText: 'ยืนยัน',
+                cancelButtonText: 'ตรวจสอบอีกครั้ง'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    
+                    // ดึงข้อมูลฟอร์ม
+                    let formElement = document.getElementById('form6005');
+                    let formData = new FormData(formElement);
+                    let formObject = {};
+                    
+                    // แปลงเป็น Object (JSON key-value)
+                    formData.forEach((value, key) => {
+                        // เช็คไฟล์ หากไม่มีการแนบ ให้ข้ามไปหรือใส่เป็นค่าว่าง
+                        if(value instanceof File) {
+                            formObject[key] = value.name ? "File: " + value.name : "";
+                            return;
+                        }
+
+                        if(!Reflect.has(formObject, key)){
+                            formObject[key] = value;
+                            return;
+                        }
+                        if(!Array.isArray(formObject[key])){
+                            formObject[key] = [formObject[key]];
+                        }
+                        formObject[key].push(value);
+                    });
+
+                    // กฎเหล็ก: แสดงข้อมูลทั้งหมดใน console.log()
+                    console.log("========== ข้อมูลแบบฟอร์ม 6005 ==========");
+                    console.log(JSON.stringify(formObject, null, 2));
+                    console.log("======================================");
+
+                    Swal.fire(
+                        'บันทึกสำเร็จ!',
+                        'ข้อมูลถูกแปลงเป็น JSON Object และแสดงใน Console.log() เรียบร้อยแล้ว',
+                        'success'
+                    );
+                }
+            });
+        }
+    </script>
+</body>
+</html>
