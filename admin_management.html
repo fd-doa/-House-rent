@@ -1,849 +1,660 @@
-
-
-    <!-- Fonts: Sarabun -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <style>
-        :root {
-            --primary-blue: #1E3A8A;
-            --secondary-blue: #3B82F6;
-            --accent-yellow: #FBBF24;
-            --bg-gray: #F3F4F6;
-        }
-
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: var(--bg-gray);
-            color: #333;
-            overflow-x: hidden;
-        }
-
-        /* Sidebar Styling */
-        #sidebar {
-            width: 280px;
-            height: 100vh;
-            position: fixed;
-            background: linear-gradient(180deg, var(--primary-blue) 0%, #1e40af 100%);
-            color: white;
-            z-index: 1000;
-        }
-
-        .nav-item {
-            padding: 12px 20px;
-            margin: 4px 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 15px;
-            font-weight: 500;
-            color: #BFDBFE;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background-color: rgba(255, 255, 255, 0.15);
-            color: var(--accent-yellow);
-            transform: translateX(5px);
-        }
-
-        /* Main Content */
-        #main-content {
-            margin-left: 280px;
-            padding: 20px 30px;
-            min-height: 100vh;
-        }
-
-        /* Top Header & Profile */
-        .top-header {
-            background: white;
-            padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .profile-dropdown {
-            display: none;
-            position: absolute;
-            top: 60px;
-            right: 0;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 260px;
-            z-index: 1050;
-            overflow: hidden;
-        }
-        .profile-dropdown.show { display: block; }
-
-        /* Cards & Containers */
-        .dashboard-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            border: 1px solid #E5E7EB;
-        }
-
-        .hide-section { display: none !important; }
-
-        /* Custom Input for Passwords */
-        .password-criteria {
-            font-size: 12px;
-            color: #6B7280;
-            margin-top: 5px;
-        }
-        .password-criteria.valid { color: #10B981; }
-        .password-criteria.invalid { color: #EF4444; }
-
-        /* Signature Display */
-        .sig-preview-box {
-            border: 2px dashed #cbd5e1;
-            border-radius: 8px;
-            height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f8fafc;
-            overflow: hidden;
-            position: relative;
-        }
-        .sig-preview-box img { max-height: 100%; max-width: 100%; object-fit: contain; }
-
-        @media (max-width: 768px) {
-            #sidebar { display: none; }
-            #main-content { margin-left: 0; padding: 15px; }
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Sidebar Navigation -->
-    <aside id="sidebar" class="shadow-xl">
-        <div class="p-5 text-center border-b border-blue-800">
-            <div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center mb-2 shadow-lg">
-                <i class="fa-solid fa-cogs text-3xl text-blue-900"></i>
-            </div>
-            <h5 class="text-yellow-400 font-bold text-base">การตั้งค่าและจัดการ</h5>
+<!-- Top Header & Profile Area -->
+<header class="top-header relative bg-white p-4 rounded-2xl shadow-sm mb-4 border-t-4 border-blue-800">
+    <div class="flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <h5 class="m-0 text-blue-900 font-bold" id="page-title"><i class="fa-solid fa-users-gear mr-2"></i> ข้อมูลผู้ใช้งานระบบ</h5>
         </div>
         
-        <div class="mt-4">
-            <div class="text-xs text-blue-300 ml-6 mt-4 mb-2 uppercase font-bold">เมนูผู้ดูแลระบบ (Admin)</div>
-            <div class="nav-item active" onclick="switchTab('users')">
-                <i class="fa-solid fa-users-gear w-5"></i> ข้อมูลผู้ใช้งานระบบ
-            </div>
-            <div class="nav-item" onclick="switchTab('settings')">
-                <i class="fa-solid fa-sliders w-5"></i> ตั้งค่าระบบและองค์กร
-            </div>
-            <div class="nav-item" onclick="switchTab('budget')">
-                <i class="fa-solid fa-sack-dollar w-5"></i> จัดสรรงบประมาณ (ประเมิน)
-            </div>
-            <div class="mt-8 border-t border-blue-800 pt-4">
-                <div class="nav-item text-red-300 hover:text-red-100" onclick="logout()">
-                    <i class="fa-solid fa-right-from-bracket w-5"></i> ออกจากระบบ
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main id="main-content">
-        
-        <!-- Top Header & Profile Area -->
-        <header class="top-header relative">
-            <div class="flex items-center gap-3">
-                <h4 class="m-0 text-blue-900 font-bold" id="page-title">จัดการระบบและผู้ใช้งาน</h4>
+        <div class="flex items-center gap-5">
+            <!-- กระดิ่งแจ้งเตือน -->
+            <div class="relative cursor-pointer hover:text-blue-600 transition" onclick="toggleNotifications()">
+                <i class="fa-regular fa-bell text-2xl text-gray-600"></i>
+                <span class="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center border-2 border-white font-bold">3</span>
             </div>
             
-            <div class="flex items-center gap-5">
-                <!-- กระดิ่งแจ้งเตือน -->
-                <div class="relative cursor-pointer hover:text-blue-600 transition" onclick="toggleNotifications()">
-                    <i class="fa-regular fa-bell text-2xl text-gray-600"></i>
-                    <span class="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center border-2 border-white font-bold">3</span>
-                </div>
-                
-                <!-- ไอคอนโปรไฟล์มุมขวาบน -->
-                <div class="relative">
-                    <div class="flex items-center gap-3 cursor-pointer bg-blue-50 py-1 px-3 rounded-full border border-blue-100 hover:bg-blue-100 transition" onclick="toggleProfileMenu()">
-                        <img id="headerAvatar" src="https://ui-avatars.com/api/?name=Admin&background=1E3A8A&color=fff" class="w-10 h-10 rounded-full shadow-sm">
-                        <div class="hidden md:block">
-                            <div class="text-sm font-bold text-blue-900 leading-tight">Admin System</div>
-                            <div class="text-xs text-blue-600 leading-tight">ผู้ดูแลระบบ</div>
-                        </div>
-                        <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
+            <!-- ไอคอนโปรไฟล์มุมขวาบน -->
+            <div class="relative">
+                <div class="flex items-center gap-3 cursor-pointer bg-blue-50 py-1 px-3 rounded-full border border-blue-100 hover:bg-blue-100 transition" onclick="toggleProfileMenu()">
+                    <img id="headerAvatar" src="https://ui-avatars.com/api/?name=Admin&background=1E3A8A&color=fff" class="w-10 h-10 rounded-full shadow-sm">
+                    <div class="hidden md:block">
+                        <div class="text-sm font-bold text-blue-900 leading-tight">Admin System</div>
+                        <div class="text-xs text-blue-600 leading-tight">ผู้ดูแลระบบ</div>
                     </div>
+                    <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
+                </div>
 
-                    <!-- Profile Dropdown Menu -->
-                    <div id="profileDropdown" class="profile-dropdown">
-                        <div class="p-4 bg-gradient-to-r from-blue-700 to-blue-900 text-white text-center">
-                            <img src="https://ui-avatars.com/api/?name=Admin&background=fff&color=1E3A8A" class="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-white">
-                            <h6 class="font-bold m-0">Admin System</h6>
-                            <p class="text-xs text-blue-200 m-0">กลุ่มงาน: ศูนย์เทคโนโลยีสารสนเทศ</p>
-                        </div>
-                        <div class="p-2">
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded transition" data-bs-toggle="modal" data-bs-target="#profileModal" onclick="toggleProfileMenu()">
-                                <i class="fa-solid fa-user-pen mr-2 text-blue-500"></i> จัดการโปรไฟล์ / ลายเซ็น
-                            </a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded transition" data-bs-toggle="modal" data-bs-target="#profileModal" onclick="toggleProfileMenu(); setTimeout(()=> { new bootstrap.Tab(document.querySelector('#nav-password-tab')).show() }, 300);">
-                                <i class="fa-solid fa-key mr-2 text-yellow-500"></i> เปลี่ยนรหัสผ่าน
-                            </a>
-                            <hr class="my-2">
-                            <a href="#" class="block px-4 py-2 text-sm text-red-600 font-bold hover:bg-red-50 rounded transition" onclick="logout()">
-                                <i class="fa-solid fa-sign-out-alt mr-2"></i> ออกจากระบบ
-                            </a>
-                        </div>
+                <!-- Profile Dropdown Menu -->
+                <div id="profileDropdown" class="profile-dropdown absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 hidden z-50 overflow-hidden">
+                    <div class="p-4 bg-gradient-to-r from-blue-700 to-blue-900 text-white text-center">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=fff&color=1E3A8A" class="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-white">
+                        <h6 class="font-bold m-0">Admin System</h6>
+                        <p class="text-xs text-blue-200 m-0">กลุ่มงาน: ศูนย์เทคโนโลยีสารสนเทศ</p>
+                    </div>
+                    <div class="p-2">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded transition" data-bs-toggle="modal" data-bs-target="#profileModal" onclick="toggleProfileMenu()">
+                            <i class="fa-solid fa-user-pen mr-2 text-blue-500"></i> จัดการโปรไฟล์ / ลายเซ็น
+                        </a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded transition" data-bs-toggle="modal" data-bs-target="#profileModal" onclick="toggleProfileMenu(); setTimeout(()=> { new bootstrap.Tab(document.querySelector('#nav-password-tab')).show() }, 300);">
+                            <i class="fa-solid fa-key mr-2 text-yellow-500"></i> เปลี่ยนรหัสผ่าน
+                        </a>
+                        <hr class="my-2">
+                        <a href="#" class="block px-4 py-2 text-sm text-red-600 font-bold hover:bg-red-50 rounded transition" onclick="logout()">
+                            <i class="fa-solid fa-sign-out-alt mr-2"></i> ออกจากระบบ
+                        </a>
                     </div>
                 </div>
             </div>
-        </header>
+        </div>
+    </div>
+</header>
 
-        <!-- ================= SECTION 1: ผู้ใช้งานใหม่ ================= -->
-        <section id="tab-users" class="page-section">
-            <div class="dashboard-card mb-4 border-t-4 border-blue-500">
+<!-- เมนูย่อยของ Admin (เปลี่ยนจาก Sidebar เป็น Tab ด้านบนเพื่อไม่ให้กวน Sidebar หลัก) -->
+<div class="flex flex-wrap gap-2 mb-4 border-b border-gray-300 pb-3">
+    <button class="admin-tab-btn active px-4 py-2 rounded-full font-bold bg-blue-100 text-blue-900 border border-blue-200" onclick="switchAdminTab('users', this)">
+        <i class="fa-solid fa-users-gear"></i> ข้อมูลผู้ใช้งาน
+    </button>
+    <button class="admin-tab-btn px-4 py-2 rounded-full font-bold text-gray-500 hover:bg-gray-100 transition" onclick="switchAdminTab('settings', this)">
+        <i class="fa-solid fa-sliders"></i> ตั้งค่าระบบและองค์กร
+    </button>
+    <button class="admin-tab-btn px-4 py-2 rounded-full font-bold text-gray-500 hover:bg-gray-100 transition" onclick="switchAdminTab('budget', this)">
+        <i class="fa-solid fa-sack-dollar"></i> จัดสรรงบประมาณ
+    </button>
+</div>
+
+<!-- ================= SECTION 1: ผู้ใช้งานใหม่ ================= -->
+<section id="tab-users" class="admin-page-section active">
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-4 border-t-4 border-blue-500">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="font-bold text-blue-900 m-0"><i class="fa-solid fa-filter"></i> ตัวกรองค้นหาผู้ใช้งาน</h6>
+            <button class="btn btn-primary bg-blue-600 rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="fa-solid fa-user-plus"></i> เพิ่มผู้ใช้งานใหม่
+            </button>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="ค้นหา ชื่อ-สกุล หรือ Username...">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select">
+                    <option value="">-- เลือกบทบาทสิทธิ์ --</option>
+                    <option>เจ้าหน้าที่หน่วยงาน</option>
+                    <option>หัวหน้ากลุ่ม/ฝ่าย</option>
+                    <option>ผู้อำนวยการ</option>
+                    <option>ผู้บริหารระดับสูง</option>
+                    <option>แอดมิน (Admin)</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select">
+                    <option value="">-- สถานะการใช้งาน --</option>
+                    <option>ใช้งาน (Active)</option>
+                    <option>ไม่ใช้งาน (Inactive)</option>
+                    <option>ยกเลิก (Canceled)</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-secondary w-100 rounded-pill">ล้างตัวกรอง</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle text-sm text-center mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Username</th>
+                        <th>ชื่อ-สกุล (ไทย)</th>
+                        <th>ตำแหน่ง</th>
+                        <th>หน่วยงาน / กลุ่มฝ่าย</th>
+                        <th>บทบาท</th>
+                        <th>สถานะ</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="font-bold">somchai.r</td>
+                        <td class="text-start">นายสมชาย รักเรียน</td>
+                        <td>นักวิชาการเกษตร</td>
+                        <td>สถาบันวิจัยพืชสวน</td>
+                        <td><span class="badge bg-blue-100 text-blue-800 rounded-pill">เจ้าหน้าที่หน่วยงาน</span></td>
+                        <td><span class="badge bg-success rounded-pill">ใช้งาน</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-warning rounded-circle"><i class="fa-solid fa-pen"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-bold">director.p</td>
+                        <td class="text-start">นายประธาน บริหารดี</td>
+                        <td>ผู้อำนวยการกอง</td>
+                        <td>กองบริหารการคลัง</td>
+                        <td><span class="badge bg-purple-100 text-purple-800 rounded-pill">ผู้บริหารระดับสูง</span></td>
+                        <td><span class="badge bg-success rounded-pill">ใช้งาน</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-warning rounded-circle"><i class="fa-solid fa-pen"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ================= SECTION 2: ตั้งค่าระบบ ================= -->
+<section id="tab-settings" class="admin-page-section hide-section">
+    <div class="row g-4">
+        
+        <!-- ข้อมูลองค์กร -->
+        <div class="col-md-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 h-100 border-t-4 border-yellow-400">
+                <h6 class="font-bold text-blue-900 mb-4"><i class="fa-solid fa-building"></i> ข้อมูลองค์กรและระบบ</h6>
+                <form onsubmit="saveOrgSettings(event)">
+                    <div class="text-center mb-4">
+                        <div class="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg mx-auto flex items-center justify-center bg-gray-50 overflow-hidden relative group cursor-pointer" onclick="document.getElementById('logoUpload').click()">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Seal_of_the_Department_of_Agriculture_%28Thailand%29.svg/1200px-Seal_of_the_Department_of_Agriculture_%28Thailand%29.svg.png" id="logoPreview" class="w-full h-full object-contain p-1">
+                            <div class="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center text-white text-xs text-center flex-col">
+                                <i class="fa-solid fa-camera mb-1"></i> เปลี่ยนโลโก้
+                            </div>
+                            <input type="file" id="logoUpload" class="hidden" accept="image/*" onchange="previewImage(this, 'logoPreview')">
+                        </div>
+                        <span class="text-xs text-gray-400 mt-1 d-block">ระบบจะจัดบล็อกขนาดให้อัตโนมัติ</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-sm font-bold">ชื่อระบบ (แสดงบนหัวเว็บ)</label>
+                        <input type="text" name="systemName" class="form-control form-control-sm" value="ระบบขอรับสิทธิและเบิกเงินค่าเช่าบ้านข้าราชการ">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-sm font-bold">ชื่อหน่วยงาน</label>
+                        <input type="text" name="orgName" class="form-control form-control-sm" value="กองบริหารการคลัง กรมวิชาการเกษตร">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-sm font-bold">ที่อยู่ติดต่อ</label>
+                        <textarea name="orgAddress" class="form-control form-control-sm" rows="2">50 ถนนพหลโยธิน แขวงลาดยาว เขตจตุจักร กรุงเทพฯ 10900</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label text-sm font-bold">เบอร์โทรศัพท์</label>
+                            <input type="text" name="orgPhone" class="form-control form-control-sm" value="02-579-0151">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label text-sm font-bold">Email</label>
+                            <input type="email" name="orgEmail" class="form-control form-control-sm" value="finance@doa.go.th">
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary btn-sm bg-blue-600 rounded-pill px-4"><i class="fa-solid fa-save"></i> บันทึกข้อมูลองค์กร</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- การตั้งค่าตัวแปรระบบ -->
+        <div class="col-md-6">
+            
+            <!-- ปีงบประมาณ -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-4 border-l-4 border-green-500">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="font-bold text-blue-900 m-0"><i class="fa-solid fa-users"></i> ตัวกรองค้นหาผู้ใช้งาน</h6>
-                    <button class="btn btn-primary bg-blue-600 rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                        <i class="fa-solid fa-user-plus"></i> เพิ่มผู้ใช้งานใหม่
-                    </button>
+                    <h6 class="font-bold text-blue-900 m-0"><i class="fa-solid fa-calendar-alt text-green-600"></i> จัดการปีงบประมาณ พ.ศ.</h6>
+                    <button class="btn btn-sm btn-outline-success rounded-pill" onclick="addFiscalYear()"><i class="fa-solid fa-plus"></i> เพิ่มปี</button>
                 </div>
-                
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <input type="text" class="form-control" placeholder="ค้นหา ชื่อ-สกุล หรือ Username...">
-                    </div>
-                    <div class="col-md-3">
-                        <select class="form-select">
-                            <option value="">-- เลือกบทบาทสิทธิ์ --</option>
-                            <option>เจ้าหน้าที่หน่วยงาน</option>
-                            <option>หัวหน้ากลุ่ม/ฝ่าย</option>
-                            <option>ผู้อำนวยการ</option>
-                            <option>ผู้บริหารระดับสูง</option>
-                            <option>แอดมิน (Admin)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <select class="form-select">
-                            <option value="">-- สถานะการใช้งาน --</option>
-                            <option>ใช้งาน (Active)</option>
-                            <option>ไม่ใช้งาน (Inactive)</option>
-                            <option>ยกเลิก (Canceled)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <button class="btn btn-outline-secondary w-100">ล้างตัวกรอง</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dashboard-card">
+                <p class="text-xs text-gray-500">ปีที่ Set เป็นปัจจุบัน จะผูกกับการออกเลขที่อนุมัติคำขอ (เช่น 001/2567)</p>
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle text-sm text-center">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Username</th>
-                                <th>ชื่อ-สกุล (ไทย)</th>
-                                <th>ตำแหน่ง</th>
-                                <th>หน่วยงาน / กลุ่มฝ่าย</th>
-                                <th>บทบาท</th>
-                                <th>สถานะ</th>
-                                <th>จัดการ</th>
-                            </tr>
-                        </thead>
+                    <table class="table table-sm align-middle text-center border mb-0">
+                        <thead class="bg-gray-100"><tr><th>ปีงบประมาณ พ.ศ.</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
                         <tbody>
                             <tr>
-                                <td class="font-bold">somchai.r</td>
-                                <td class="text-start">นายสมชาย รักเรียน</td>
-                                <td>นักวิชาการเกษตร</td>
-                                <td>สถาบันวิจัยพืชสวน</td>
-                                <td><span class="badge bg-blue-100 text-blue-800">เจ้าหน้าที่หน่วยงาน</span></td>
-                                <td><span class="badge bg-success">ใช้งาน</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-warning"><i class="fa-solid fa-pen"></i></button>
-                                </td>
+                                <td class="font-bold">2567</td>
+                                <td><span class="badge bg-success rounded-pill">ปัจจุบัน (Current)</span></td>
+                                <td><button class="btn btn-sm btn-secondary rounded-pill" disabled>Set เป็นปัจจุบัน</button></td>
                             </tr>
                             <tr>
-                                <td class="font-bold">director.p</td>
-                                <td class="text-start">นายประธาน บริหารดี</td>
-                                <td>ผู้อำนวยการกอง</td>
-                                <td>กองบริหารการคลัง</td>
-                                <td><span class="badge bg-purple-100 text-purple-800">ผู้บริหารระดับสูง</span></td>
-                                <td><span class="badge bg-success">ใช้งาน</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-warning"><i class="fa-solid fa-pen"></i></button>
-                                </td>
+                                <td>2568</td>
+                                <td><span class="badge bg-secondary rounded-pill">เตรียมพร้อม</span></td>
+                                <td><button class="btn btn-sm btn-outline-success rounded-pill" onclick="setCurrentYear(2568)">Set เป็นปัจจุบัน</button></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </section>
 
-        <!-- ================= SECTION 2: ตั้งค่าระบบ ================= -->
-        <section id="tab-settings" class="page-section hide-section">
-            <div class="row g-4">
-                
-                <!-- ข้อมูลองค์กร -->
-                <div class="col-md-6">
-                    <div class="dashboard-card h-100 border-t-4 border-yellow-400">
-                        <h6 class="font-bold text-blue-900 mb-4"><i class="fa-solid fa-building"></i> ข้อมูลองค์กรและระบบ</h6>
-                        <form onsubmit="saveOrgSettings(event)">
-                            <div class="text-center mb-4">
-                                <div class="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg mx-auto flex items-center justify-center bg-gray-50 overflow-hidden relative group cursor-pointer" onclick="document.getElementById('logoUpload').click()">
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Seal_of_the_Department_of_Agriculture_%28Thailand%29.svg/1200px-Seal_of_the_Department_of_Agriculture_%28Thailand%29.svg.png" id="logoPreview" class="w-full h-full object-contain p-1">
-                                    <div class="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center text-white text-xs text-center flex-col">
-                                        <i class="fa-solid fa-camera mb-1"></i> เปลี่ยนโลโก้
+            <!-- หน่วยงาน/แผนก -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 border-l-4 border-purple-500">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="font-bold text-blue-900 m-0"><i class="fa-solid fa-sitemap text-purple-600"></i> ข้อมูลหน่วยงานย่อย</h6>
+                    <button class="btn btn-sm btn-outline-purple border-purple-500 text-purple-700 rounded-pill"><i class="fa-solid fa-plus"></i> เพิ่มหน่วยงาน</button>
+                </div>
+                <p class="text-xs text-gray-500">สำหรับเชื่อมโยงสิทธิ์การมองเห็นข้อมูล และการจัดสรรงบ</p>
+                <ul class="list-group text-sm">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">กองบริหารการคลัง <span class="badge bg-primary rounded-pill">12 คน</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">สถาบันวิจัยพืชสวน <span class="badge bg-primary rounded-pill">45 คน</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">กองวิจัยพัฒนาพืชการค้า <span class="badge bg-primary rounded-pill">28 คน</span></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ================= SECTION 3: จัดสรรงบประมาณ (อนาคต) ================= -->
+<section id="tab-budget" class="admin-page-section hide-section">
+    <div class="bg-white rounded-xl shadow-sm mb-4 border-t-4 border-green-500 text-center py-5 bg-gradient-to-b from-white to-green-50">
+        <i class="fa-solid fa-coins text-6xl text-green-500 mb-3"></i>
+        <h4 class="font-bold text-blue-900">ระบบจัดสรรงบประมาณประจำปี</h4>
+        <p class="text-gray-600 max-w-2xl mx-auto">นำเข้าข้อมูล CSV/Excel เพื่อเป็นฐานข้อมูลงบประมาณประจำปีของแต่ละหน่วยงาน สำหรับใช้หักยอดเบิกค่าเช่าบ้านในภาพรวม รองรับการโอนยอดคงเหลือในปีถัดไป</p>
+        
+        <div class="mt-4 flex justify-center gap-3">
+            <button class="btn btn-primary bg-green-600 rounded-pill px-5 py-2 shadow-sm"><i class="fa-solid fa-file-import"></i> นำเข้าไฟล์จัดสรรงบ (CSV)</button>
+            <button class="btn btn-outline-success rounded-pill px-5 py-2 bg-white"><i class="fa-solid fa-plus"></i> เพิ่มงบระหว่างปีให้หน่วยงาน</button>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+        <h6 class="font-bold text-blue-900 mb-3">ตารางจำลองฐานข้อมูลงบประมาณประจำปี</h6>
+        <div class="table-responsive">
+            <table class="table table-bordered text-sm align-middle text-center mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>หน่วยงาน</th>
+                        <th>ปีงบประมาณ</th>
+                        <th>งบตั้งต้น (บาท)</th>
+                        <th>งบเพิ่มเติม (บาท)</th>
+                        <th>เบิกจ่ายรวม (บาท)</th>
+                        <th class="bg-green-50 font-bold text-green-700">คงเหลือยกไป (บาท)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-start">กองบริหารการคลัง</td><td>2567</td><td class="text-end">1,500,000</td><td class="text-end">0</td><td class="text-end text-danger">850,000</td><td class="text-end font-bold text-green-700 bg-green-50">650,000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ================= MODALS ================= -->
+
+<!-- Modal เพิ่มผู้ใช้งานใหม่ -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-blue-900 text-white border-0">
+                <h5 class="modal-title font-bold"><i class="fa-solid fa-user-plus mr-2"></i> สร้างบัญชีผู้ใช้งานใหม่</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-gray-50">
+                <form id="addUserForm" onsubmit="saveNewUser(event)">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-sm font-bold">ชื่อ-สกุล (ภาษาไทย) *</label>
+                            <input type="text" name="nameTh" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-sm font-bold">ชื่อ-สกุล (English)</label>
+                            <input type="text" name="nameEn" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-sm font-bold">ตำแหน่ง *</label>
+                            <input type="text" name="position" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-sm font-bold">Email *</label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-sm font-bold">หน่วยงาน *</label>
+                            <select class="form-select" name="department" required>
+                                <option value="">-- เลือกหน่วยงาน --</option>
+                                <option>กองบริหารการคลัง</option>
+                                <option>สถาบันวิจัยพืชสวน</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-sm font-bold">กลุ่ม/ฝ่าย</label>
+                            <input type="text" name="subDepartment" class="form-control">
+                        </div>
+                        
+                        <hr class="my-3 border-gray-300">
+                        
+                        <div class="col-md-6">
+                            <label class="form-label text-sm font-bold text-blue-800">Username *</label>
+                            <input type="text" name="username" class="form-control border-blue-300" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-sm font-bold text-blue-800">บทบาทสิทธิ์ในระบบ (Role) *</label>
+                            <select class="form-select border-blue-400" name="role" required>
+                                <option value="">-- ดึงจากฐานข้อมูล Google Sheet --</option>
+                                <option value="user">เจ้าหน้าที่หน่วยงาน</option>
+                                <option value="head">หัวหน้ากลุ่ม/ฝ่าย</option>
+                                <option value="finance">เจ้าหน้าที่กลุ่มบัญชี</option>
+                                <option value="exec">ผู้บริหารระดับสูง</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-sm font-bold text-blue-800">Password *</label>
+                            <input type="password" id="newPassword" name="password" class="form-control border-blue-300" 
+                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{6,}" 
+                                title="ต้องมี 6 ตัวอักษรขึ้นไป ประกอบด้วย ตัวพิมพ์ใหญ่ ตัวพิมพ์เล็ก ตัวเลข และสัญลักษณ์" required
+                                oninput="checkPasswordStrength(this.value)">
+                            <div id="pwdFeedback" class="text-xs mt-1 text-red-500">
+                                <i class="fa-solid fa-circle-xmark"></i> อักษรพิมพ์ใหญ่, พิมพ์เล็ก, สัญลักษณ์, ตัวเลข, ขั้นต่ำ 6 หลัก
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-sm font-bold">สถานะการใช้งาน</label>
+                            <select class="form-select" name="status">
+                                <option value="active">ใช้งาน (Active)</option>
+                                <option value="inactive">ไม่ใช้งาน (Inactive)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="text-end mt-4">
+                        <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary bg-blue-600 rounded-pill px-4"><i class="fa-solid fa-save"></i> บันทึกผู้ใช้งาน</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal จัดการโปรไฟล์ -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient-to-r from-blue-700 to-blue-900 text-white border-0">
+                <h5 class="modal-title font-bold"><i class="fa-solid fa-user-circle mr-2"></i> ตั้งค่าโปรไฟล์ส่วนตัว</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 bg-white">
+                <nav>
+                    <div class="nav nav-tabs bg-gray-50 pt-2 px-3 border-b" id="nav-tab" role="tablist">
+                        <button class="nav-link active font-bold text-gray-700" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button">ข้อมูล & รูปโปรไฟล์</button>
+                        <button class="nav-link font-bold text-gray-700" id="nav-password-tab" data-bs-toggle="tab" data-bs-target="#nav-password" type="button">เปลี่ยนรหัสผ่าน</button>
+                        <button class="nav-link font-bold text-gray-700" id="nav-signature-tab" data-bs-toggle="tab" data-bs-target="#nav-signature" type="button">ลายเซ็นอิเล็กทรอนิกส์</button>
+                    </div>
+                </nav>
+                <div class="tab-content p-4" id="nav-tabContent">
+                    
+                    <!-- Tab 1: ข้อมูล -->
+                    <div class="tab-pane fade show active" id="nav-profile">
+                        <div class="row">
+                            <div class="col-md-4 text-center border-r border-gray-200">
+                                <div class="relative inline-block mb-3 group cursor-pointer" onclick="document.getElementById('profilePicUpload').click()">
+                                    <img src="https://ui-avatars.com/api/?name=Admin&background=1E3A8A&color=fff" id="userAvatarPreview" class="w-32 h-32 rounded-full border-4 border-blue-100 object-cover">
+                                    <div class="absolute inset-0 bg-black/50 rounded-full hidden group-hover:flex items-center justify-center text-white">
+                                        <i class="fa-solid fa-camera text-2xl"></i>
                                     </div>
-                                    <input type="file" id="logoUpload" class="hidden" accept="image/*" onchange="previewImage(this, 'logoPreview')">
+                                    <input type="file" id="profilePicUpload" class="hidden" accept="image/*" onchange="previewImage(this, 'userAvatarPreview')">
                                 </div>
-                                <span class="text-xs text-gray-400 mt-1 d-block">ระบบจะจัดบล็อกขนาดให้อัตโนมัติ</span>
+                                <h6 class="font-bold text-blue-900">Admin System</h6>
+                                <span class="badge bg-blue-100 text-blue-800 mb-2 rounded-pill">ผู้ดูแลระบบ</span>
                             </div>
-                            
+                            <div class="col-md-8">
+                                <form onsubmit="event.preventDefault(); Swal.fire('สำเร็จ','อัปเดตข้อมูลสำเร็จ','success')">
+                                    <div class="mb-3">
+                                        <label class="text-sm font-bold text-gray-600">ชื่อผู้ใช้ (Username)</label>
+                                        <input type="text" class="form-control" value="admin.system" readonly disabled>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-sm font-bold text-gray-600">อีเมลติดต่อ</label>
+                                        <input type="email" class="form-control" value="admin@doa.go.th">
+                                    </div>
+                                    <div class="text-end mt-4">
+                                        <button type="submit" class="btn btn-primary bg-blue-600 rounded-pill px-4">บันทึกข้อมูล</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: รหัสผ่าน -->
+                    <div class="tab-pane fade" id="nav-password">
+                        <form onsubmit="changePassword(event)">
                             <div class="mb-3">
-                                <label class="form-label text-sm font-bold">ชื่อระบบ (แสดงบนหัวเว็บ)</label>
-                                <input type="text" name="systemName" class="form-control form-control-sm" value="ระบบขอรับสิทธิและเบิกเงินค่าเช่าบ้านข้าราชการ">
+                                <label class="text-sm font-bold">รหัสผ่านปัจจุบัน</label>
+                                <input type="password" class="form-control" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-sm font-bold">ชื่อหน่วยงาน</label>
-                                <input type="text" name="orgName" class="form-control form-control-sm" value="กองบริหารการคลัง กรมวิชาการเกษตร">
+                                <label class="text-sm font-bold">รหัสผ่านใหม่ <span class="text-xs text-red-500">(พิมพ์ใหญ่-เล็ก, เลข, สัญลักษณ์, 6 หลัก)</span></label>
+                                <input type="password" class="form-control" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{6,}">
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label text-sm font-bold">ที่อยู่ติดต่อ</label>
-                                <textarea name="orgAddress" class="form-control form-control-sm" rows="2">50 ถนนพหลโยธิน แขวงลาดยาว เขตจตุจักร กรุงเทพฯ 10900</textarea>
-                            </div>
-                            <div class="row">
-                                <div class="col-6 mb-3">
-                                    <label class="form-label text-sm font-bold">เบอร์โทรศัพท์</label>
-                                    <input type="text" name="orgPhone" class="form-control form-control-sm" value="02-579-0151">
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <label class="form-label text-sm font-bold">Email</label>
-                                    <input type="email" name="orgEmail" class="form-control form-control-sm" value="finance@doa.go.th">
-                                </div>
+                            <div class="mb-4">
+                                <label class="text-sm font-bold">ยืนยันรหัสผ่านใหม่</label>
+                                <input type="password" class="form-control" required>
                             </div>
                             <div class="text-end">
-                                <button type="submit" class="btn btn-primary btn-sm bg-blue-600 rounded-pill px-4"><i class="fa-solid fa-save"></i> บันทึกข้อมูลองค์กร</button>
+                                <button type="submit" class="btn btn-warning rounded-pill px-4 font-bold">เปลี่ยนรหัสผ่าน</button>
                             </div>
                         </form>
                     </div>
-                </div>
 
-                <!-- การตั้งค่าตัวแปรระบบ -->
-                <div class="col-md-6">
-                    
-                    <!-- ปีงบประมาณ -->
-                    <div class="dashboard-card mb-4 border-l-4 border-green-500">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="font-bold text-blue-900 m-0"><i class="fa-solid fa-calendar-alt text-green-600"></i> จัดการปีงบประมาณ พ.ศ.</h6>
-                            <button class="btn btn-sm btn-outline-success rounded-pill" onclick="addFiscalYear()"><i class="fa-solid fa-plus"></i> เพิ่มปี</button>
+                    <!-- Tab 3: ลายเซ็น -->
+                    <div class="tab-pane fade" id="nav-signature">
+                        <div class="alert alert-warning text-sm rounded-xl">
+                            <i class="fa-solid fa-circle-info"></i> <b>คำแนะนำ:</b> กรุณาแนบไฟล์ลายเซ็น <code>.jpg</code> หรือ <code>.png</code> ที่มีพื้นหลังโปร่งใส
                         </div>
-                        <p class="text-xs text-gray-500">ปีที่ Set เป็นปัจจุบัน จะผูกกับการออกเลขที่อนุมัติคำขอ (เช่น 001/2567)</p>
-                        <div class="table-responsive">
-                            <table class="table table-sm align-middle text-center border">
-                                <thead class="bg-gray-100"><tr><th>ปีงบประมาณ พ.ศ.</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="font-bold">2567</td>
-                                        <td><span class="badge bg-success">ปัจจุบัน (Current)</span></td>
-                                        <td><button class="btn btn-sm btn-secondary" disabled>Set เป็นปัจจุบัน</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>2568</td>
-                                        <td><span class="badge bg-secondary">เตรียมพร้อม</span></td>
-                                        <td><button class="btn btn-sm btn-outline-success" onclick="setCurrentYear(2568)">Set เป็นปัจจุบัน</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- หน่วยงาน/แผนก -->
-                    <div class="dashboard-card border-l-4 border-purple-500">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="font-bold text-blue-900 m-0"><i class="fa-solid fa-sitemap text-purple-600"></i> ข้อมูลหน่วยงานย่อย</h6>
-                            <button class="btn btn-sm btn-outline-purple border-purple-500 text-purple-700 rounded-pill"><i class="fa-solid fa-plus"></i> เพิ่มหน่วยงาน</button>
-                        </div>
-                        <p class="text-xs text-gray-500">สำหรับเชื่อมโยงสิทธิ์การมองเห็นข้อมูล และการจัดสรรงบ</p>
-                        <ul class="list-group text-sm">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">กองบริหารการคลัง <span class="badge bg-primary rounded-pill">12 คน</span></li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">สถาบันวิจัยพืชสวน <span class="badge bg-primary rounded-pill">45 คน</span></li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">กองวิจัยพัฒนาพืชการค้า <span class="badge bg-primary rounded-pill">28 คน</span></li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ================= SECTION 3: จัดสรรงบประมาณ (อนาคต) ================= -->
-        <section id="tab-budget" class="page-section hide-section">
-            <div class="dashboard-card mb-4 border-t-4 border-green-500 text-center py-5 bg-gradient-to-b from-white to-green-50">
-                <i class="fa-solid fa-coins text-6xl text-green-500 mb-3"></i>
-                <h4 class="font-bold text-blue-900">ระบบจัดสรรงบประมาณประจำปี</h4>
-                <p class="text-gray-600 max-w-2xl mx-auto">นำเข้าข้อมูล CSV/Excel เพื่อเป็นฐานข้อมูลงบประมาณประจำปีของแต่ละหน่วยงาน สำหรับใช้หักยอดเบิกค่าเช่าบ้านในภาพรวม รองรับการโอนยอดคงเหลือในปีถัดไป</p>
-                
-                <div class="mt-4 flex justify-center gap-3">
-                    <button class="btn btn-primary bg-green-600 rounded-pill px-5 py-2"><i class="fa-solid fa-file-import"></i> นำเข้าไฟล์จัดสรรงบ (CSV)</button>
-                    <button class="btn btn-outline-success rounded-pill px-5 py-2"><i class="fa-solid fa-plus"></i> เพิ่มงบระหว่างปีให้หน่วยงาน</button>
-                </div>
-            </div>
-
-            <div class="dashboard-card">
-                <h6 class="font-bold text-blue-900 mb-3">ตารางจำลองฐานข้อมูลงบประมาณประจำปี</h6>
-                <div class="table-responsive">
-                    <table class="table table-bordered text-sm align-middle text-center">
-                        <thead class="table-light">
-                            <tr>
-                                <th>หน่วยงาน</th>
-                                <th>ปีงบประมาณ</th>
-                                <th>งบตั้งต้น (บาท)</th>
-                                <th>งบเพิ่มเติม (บาท)</th>
-                                <th>เบิกจ่ายรวม (บาท)</th>
-                                <th class="bg-green-50 font-bold text-green-700">คงเหลือยกไป (บาท)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="text-start">กองบริหารการคลัง</td><td>2567</td><td class="text-end">1,500,000</td><td class="text-end">0</td><td class="text-end text-danger">850,000</td><td class="text-end font-bold text-green-700 bg-green-50">650,000</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- ================= MODALS ================= -->
-
-    <!-- Modal เพิ่มผู้ใช้งานใหม่ -->
-    <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-blue-900 text-white border-0">
-                    <h5 class="modal-title font-bold"><i class="fa-solid fa-user-plus mr-2"></i> สร้างบัญชีผู้ใช้งานใหม่</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4 bg-gray-50">
-                    <form id="addUserForm" onsubmit="saveNewUser(event)">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label text-sm font-bold">ชื่อ-สกุล (ภาษาไทย) *</label>
-                                <input type="text" name="nameTh" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-sm font-bold">ชื่อ-สกุล (English)</label>
-                                <input type="text" name="nameEn" class="form-control">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-sm font-bold">ตำแหน่ง *</label>
-                                <input type="text" name="position" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-sm font-bold">Email *</label>
-                                <input type="email" name="email" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-sm font-bold">หน่วยงาน *</label>
-                                <select class="form-select" name="department" required>
-                                    <option value="">-- เลือกหน่วยงาน --</option>
-                                    <option>กองบริหารการคลัง</option>
-                                    <option>สถาบันวิจัยพืชสวน</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-sm font-bold">กลุ่ม/ฝ่าย</label>
-                                <input type="text" name="subDepartment" class="form-control">
-                            </div>
-                            
-                            <hr class="my-2 border-gray-300">
-                            
-                            <div class="col-md-6">
-                                <label class="form-label text-sm font-bold text-blue-800">Username *</label>
-                                <input type="text" name="username" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-sm font-bold text-blue-800">บทบาทสิทธิ์ในระบบ (Role) *</label>
-                                <select class="form-select border-blue-400" name="role" required>
-                                    <option value="">-- ดึงจากฐานข้อมูล Google Sheet --</option>
-                                    <option value="user">เจ้าหน้าที่หน่วยงาน</option>
-                                    <option value="head">หัวหน้ากลุ่ม/ฝ่าย</option>
-                                    <option value="finance">เจ้าหน้าที่กลุ่มบัญชี</option>
-                                    <option value="exec">ผู้บริหารระดับสูง</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-sm font-bold text-blue-800">Password *</label>
-                                <!-- Regex ควบคุมรหัสผ่าน -->
-                                <input type="password" id="newPassword" name="password" class="form-control" 
-                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{6,}" 
-                                    title="ต้องมี 6 ตัวอักษรขึ้นไป ประกอบด้วย ตัวพิมพ์ใหญ่ ตัวพิมพ์เล็ก ตัวเลข และสัญลักษณ์" required
-                                    oninput="checkPasswordStrength(this.value)">
-                                <div id="pwdFeedback" class="password-criteria invalid">
-                                    <i class="fa-solid fa-circle-xmark"></i> อักษรพิมพ์ใหญ่, พิมพ์เล็ก, สัญลักษณ์, ตัวเลข, ขั้นต่ำ 6 หลัก
+                        <div class="row align-items-center">
+                            <div class="col-md-6 text-center">
+                                <p class="font-bold mb-2">ลายเซ็นปัจจุบัน</p>
+                                <div class="border rounded p-3 bg-gray-50 h-32 flex items-center justify-center">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f6/Signature_of_John_Hancock.svg" id="sigPreview" class="max-h-24">
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label text-sm font-bold">สถานะการใช้งาน</label>
-                                <select class="form-select" name="status">
-                                    <option value="active">ใช้งาน (Active)</option>
-                                    <option value="inactive">ไม่ใช้งาน (Inactive)</option>
-                                </select>
+                                <div class="d-grid gap-3 mt-3 mt-md-0">
+                                    <button class="btn btn-outline-primary rounded-pill" onclick="document.getElementById('sigUpload').click()">
+                                        <i class="fa-solid fa-upload"></i> สร้าง/อัปโหลด ลายเซ็นใหม่
+                                    </button>
+                                    <input type="file" id="sigUpload" class="hidden" accept="image/png, image/jpeg" onchange="previewImage(this, 'sigPreview')">
+                                    
+                                    <button class="btn btn-outline-danger rounded-pill" onclick="deleteSignature()">
+                                        <i class="fa-solid fa-trash"></i> ลบลายเซ็นปัจจุบัน
+                                    </button>
+                                    
+                                    <button class="btn btn-success bg-green-600 border-0 mt-2 rounded-pill" onclick="Swal.fire('สำเร็จ','บันทึกลายเซ็นอิเล็กทรอนิกส์เรียบร้อย','success')">
+                                        <i class="fa-solid fa-save"></i> บันทึกลายเซ็น
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <div class="text-end mt-4">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-                            <button type="submit" class="btn btn-primary bg-blue-600"><i class="fa-solid fa-save"></i> บันทึกผู้ใช้งาน</button>
-                        </div>
-                    </form>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal จัดการโปรไฟล์ (ผู้ใช้ทุกคนเข้าถึงได้) -->
-    <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-gradient-to-r from-blue-700 to-blue-900 text-white border-0">
-                    <h5 class="modal-title font-bold"><i class="fa-solid fa-user-circle mr-2"></i> ตั้งค่าโปรไฟล์ส่วนตัว</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-0 bg-white">
-                    <nav>
-                        <div class="nav nav-tabs bg-gray-50 pt-2 px-3 border-b" id="nav-tab" role="tablist">
-                            <button class="nav-link active font-bold text-gray-700" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button">ข้อมูล & รูปโปรไฟล์</button>
-                            <button class="nav-link font-bold text-gray-700" id="nav-password-tab" data-bs-toggle="tab" data-bs-target="#nav-password" type="button">เปลี่ยนรหัสผ่าน</button>
-                            <button class="nav-link font-bold text-gray-700" id="nav-signature-tab" data-bs-toggle="tab" data-bs-target="#nav-signature" type="button">ลายเซ็นอิเล็กทรอนิกส์</button>
-                        </div>
-                    </nav>
-                    <div class="tab-content p-4" id="nav-tabContent">
-                        
-                        <!-- Tab 1: ข้อมูล -->
-                        <div class="tab-pane fade show active" id="nav-profile">
-                            <div class="row">
-                                <div class="col-md-4 text-center border-r border-gray-200">
-                                    <div class="relative inline-block mb-3 group cursor-pointer" onclick="document.getElementById('profilePicUpload').click()">
-                                        <img src="https://ui-avatars.com/api/?name=Admin&background=1E3A8A&color=fff" id="userAvatarPreview" class="w-32 h-32 rounded-full border-4 border-blue-100 object-cover">
-                                        <div class="absolute inset-0 bg-black/50 rounded-full hidden group-hover:flex items-center justify-center text-white">
-                                            <i class="fa-solid fa-camera text-2xl"></i>
-                                        </div>
-                                        <input type="file" id="profilePicUpload" class="hidden" accept="image/*" onchange="previewImage(this, 'userAvatarPreview')">
-                                    </div>
-                                    <h6 class="font-bold text-blue-900">Admin System</h6>
-                                    <span class="badge bg-blue-100 text-blue-800 mb-2">ผู้ดูแลระบบ</span>
-                                </div>
-                                <div class="col-md-8">
-                                    <form onsubmit="event.preventDefault(); Swal.fire('สำเร็จ','อัปเดตข้อมูลสำเร็จ','success')">
-                                        <div class="mb-3">
-                                            <label class="text-sm font-bold text-gray-600">ชื่อผู้ใช้ (Username)</label>
-                                            <input type="text" class="form-control" value="admin.system" readonly disabled>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="text-sm font-bold text-gray-600">อีเมลติดต่อ</label>
-                                            <input type="email" class="form-control" value="admin@doa.go.th">
-                                        </div>
-                                        <div class="text-end mt-4">
-                                            <button type="submit" class="btn btn-primary bg-blue-600 rounded-pill px-4">บันทึกข้อมูล</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tab 2: รหัสผ่าน -->
-                        <div class="tab-pane fade" id="nav-password">
-                            <form onsubmit="changePassword(event)">
-                                <div class="mb-3">
-                                    <label class="text-sm font-bold">รหัสผ่านปัจจุบัน</label>
-                                    <input type="password" class="form-control" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="text-sm font-bold">รหัสผ่านใหม่ <span class="text-xs text-red-500">(พิมพ์ใหญ่-เล็ก, เลข, สัญลักษณ์, 6 หลัก)</span></label>
-                                    <input type="password" class="form-control" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{6,}">
-                                </div>
-                                <div class="mb-4">
-                                    <label class="text-sm font-bold">ยืนยันรหัสผ่านใหม่</label>
-                                    <input type="password" class="form-control" required>
-                                </div>
-                                <div class="text-end">
-                                    <button type="submit" class="btn btn-warning rounded-pill px-4 font-bold">เปลี่ยนรหัสผ่าน</button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Tab 3: ลายเซ็น -->
-                        <div class="tab-pane fade" id="nav-signature">
-                            <div class="alert alert-warning text-sm">
-                                <i class="fa-solid fa-circle-info"></i> <b>คำแนะนำ:</b> กรุณาแนบไฟล์ลายเซ็น <code>.jpg</code> หรือ <code>.png</code> ที่มีพื้นหลังโปร่งใส เมื่อบันทึกแล้วลายเซ็นของท่านจะถูกนำไปใช้ประทับในคำขอ PDF อัตโนมัติ
-                            </div>
-                            
-                            <div class="row align-items-center">
-                                <div class="col-md-6 text-center">
-                                    <p class="font-bold mb-2">ลายเซ็นปัจจุบัน</p>
-                                    <div class="sig-preview-box">
-                                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f6/Signature_of_John_Hancock.svg" id="sigPreview">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="d-grid gap-3">
-                                        <button class="btn btn-outline-primary" onclick="document.getElementById('sigUpload').click()">
-                                            <i class="fa-solid fa-upload"></i> สร้าง/อัปโหลด ลายเซ็นใหม่
-                                        </button>
-                                        <input type="file" id="sigUpload" class="hidden" accept="image/png, image/jpeg" onchange="previewImage(this, 'sigPreview')">
-                                        
-                                        <button class="btn btn-outline-danger" onclick="deleteSignature()">
-                                            <i class="fa-solid fa-trash"></i> ลบลายเซ็นปัจจุบัน
-                                        </button>
-                                        
-                                        <button class="btn btn-success bg-green-600 border-0 mt-3" onclick="Swal.fire('สำเร็จ','บันทึกลายเซ็นอิเล็กทรอนิกส์เรียบร้อย ระบบจะนำไปใช้ในการออกคำขอ','success')">
-                                            <i class="fa-solid fa-save"></i> บันทึกลายเซ็น
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= JAVASCRIPT ================= -->
-    <script>
-        // --- 1. SPA Tab Switching ---
-        function switchTab(tabId) {
-            document.querySelectorAll('.page-section').forEach(el => el.classList.add('hide-section'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById('tab-' + tabId).classList.remove('hide-section');
-            event.currentTarget.classList.add('active');
-            
-            const titles = {
-                'users': 'ข้อมูลผู้ใช้งานระบบ',
-                'settings': 'ตั้งค่าระบบและองค์กร',
-                'budget': 'ระบบจัดสรรงบประมาณ'
-            };
-            document.getElementById('page-title').innerText = titles[tabId];
+<!-- ================= JAVASCRIPT ================= -->
+<script>
+    // --- 1. Admin SPA Tab Switching ---
+    function switchAdminTab(tabId, btnElement) {
+        // ซ่อนเนื้อหา Admin ทั้งหมด
+        document.querySelectorAll('.admin-page-section').forEach(el => el.classList.add('hide-section'));
+        
+        // ถอดสีปุ่มทั้งหมด
+        document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+            btn.className = 'admin-tab-btn px-4 py-2 rounded-full font-bold text-gray-500 hover:bg-gray-100 transition';
+        });
+        
+        // แสดงเนื้อหาที่เลือก
+        document.getElementById('tab-' + tabId).classList.remove('hide-section');
+        
+        // ใส่สีปุ่มที่กด
+        if(btnElement) {
+            btnElement.className = 'admin-tab-btn active px-4 py-2 rounded-full font-bold bg-blue-100 text-blue-900 border border-blue-200';
         }
-
-        // --- 2. Profile Dropdown Logic ---
-        function toggleProfileMenu() {
-            document.getElementById('profileDropdown').classList.toggle('show');
-        }
-
-        // ปิด Dropdown เมื่อคลิกที่อื่น
-        window.onclick = function(event) {
-            if (!event.target.closest('.relative')) {
-                var dropdowns = document.getElementsByClassName("profile-dropdown");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
-        }
-
-        // --- 3. Image Preview Logic (Logo, Avatar, Signature) ---
-        function previewImage(input, imgId) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById(imgId).src = e.target.result;
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        // --- 4. Add User Form Logic & Password Validation ---
-        function checkPasswordStrength(pwd) {
-            const regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{6,}/;
-            const feedback = document.getElementById('pwdFeedback');
-            if(regex.test(pwd)) {
-                feedback.classList.remove('invalid');
-                feedback.classList.add('valid');
-                feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> รหัสผ่านได้มาตรฐาน';
-            } else {
-                feedback.classList.remove('valid');
-                feedback.classList.add('invalid');
-                feedback.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> อักษรพิมพ์ใหญ่, พิมพ์เล็ก, สัญลักษณ์, ตัวเลข, ขั้นต่ำ 6 หลัก';
-            }
-        }
-
-        function saveNewUser(e) {
-            e.preventDefault();
-            // ดึงข้อมูลเป็น Object ตามกฎเหล็ก
-            let formData = new FormData(e.target);
-            let userObj = Object.fromEntries(formData.entries());
-            
-            console.log("========== ข้อมูล User ใหม่ ==========");
-            console.log(JSON.stringify(userObj, null, 2));
-            
-            Swal.fire({
-                icon: 'success',
-                title: 'สร้างบัญชีผู้ใช้สำเร็จ!',
-                text: 'รหัสผ่านถูกเข้ารหัสและเพิ่มเข้าสู่ระบบเรียบร้อย (ดูข้อมูล JSON ใน Console)'
-            }).then(() => {
-                bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
-                e.target.reset();
-                document.getElementById('pwdFeedback').className = 'password-criteria invalid';
-            });
-        }
-
-        // --- 5. System Settings Logic ---
-        function saveOrgSettings(e) {
-            e.preventDefault();
-            let formData = new FormData(e.target);
-            let orgObj = Object.fromEntries(formData.entries());
-            
-            console.log("========== ตั้งค่าองค์กร ==========");
-            console.log(JSON.stringify(orgObj, null, 2));
-
-            Swal.fire('บันทึกสำเร็จ', 'อัปเดตข้อมูลระบบและโลโก้เรียบร้อยแล้ว', 'success');
-        }
-
-        function addFiscalYear() {
-            Swal.fire({
-                title: 'เพิ่มปีงบประมาณใหม่',
-                input: 'number',
-                inputPlaceholder: 'เช่น 2568',
-                showCancelButton: true,
-                confirmButtonText: 'เพิ่มปี',
-                cancelButtonText: 'ยกเลิก',
-                inputValidator: (value) => {
-                    if (!value) return 'กรุณาระบุปีงบประมาณ!'
-                }
-            }).then((result) => {
-                if(result.isConfirmed) {
-                    Swal.fire('สำเร็จ', `เพิ่มปี ${result.value} เรียบร้อยแล้ว`, 'success');
-                    // Logic รีเฟรชตารางจะอยู่ตรงนี้
-                }
-            });
-        }
-
-        function setCurrentYear(year) {
-            Swal.fire({
-                title: `Set ปี ${year} เป็นปัจจุบัน?`,
-                text: "ระบบจะใช้ปีนี้ในการรันเลขที่อนุมัติคำขอ (เช่น 001/2568)",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#10B981',
-                confirmButtonText: 'ยืนยัน',
-                cancelButtonText: 'ยกเลิก'
-            }).then((result) => {
-                if(result.isConfirmed) {
-                    Swal.fire('ตั้งค่าเรียบร้อย', `ระบบฐานข้อมูลเปลี่ยนไปใช้ปี ${year} เรียบร้อยแล้ว`, 'success');
-                }
-            });
-        }
-
-        // --- 6. Profile Methods ---
-        function changePassword(e) {
-            e.preventDefault();
-            Swal.fire('เปลี่ยนรหัสผ่านสำเร็จ', 'รหัสผ่านใหม่ของคุณถูกเข้ารหัสและอัปเดตเรียบร้อยแล้ว', 'success').then(() => {
-                e.target.reset();
-            });
-        }
-
-        function deleteSignature() {
-            Swal.fire({
-                title: 'ยืนยันการลบลายเซ็น?',
-                text: "หากลบแล้วคุณจะต้องอัปโหลดใหม่เพื่อใช้ในเอกสาร PDF",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#EF4444',
-                confirmButtonText: 'ใช่, ลบทิ้งเลย'
-            }).then((result) => {
-                if(result.isConfirmed) {
-                    document.getElementById('sigPreview').src = '';
-                    Swal.fire('ลบสำเร็จ', '', 'success');
-                }
-            });
-        }
-
-        // --- 7. Auto Logout (จำลอง 15 นาที) ---
-        let inactivityTime = function () {
-            let time;
-            // 15 นาที = 15 * 60 * 1000 = 900000 ms. (ในตัวอย่างปรับเป็น 5 วินาทีเพื่อเทส ให้แก้เลข 900000)
-            const timeoutLimit = 900000; 
-
-            window.onload = resetTimer;
-            document.onmousemove = resetTimer;
-            document.onkeypress = resetTimer;
-
-            function logoutAction() {
-                Swal.fire({
-                    title: 'หมดเวลาการเชื่อมต่อ',
-                    text: 'ระบบได้ออกจากระบบอัตโนมัติ เนื่องจากไม่มีการใช้งานเกิน 15 นาที เพื่อความปลอดภัย',
-                    icon: 'warning',
-                    confirmButtonText: 'ตกลง'
-                }).then(() => {
-                    // Redirect to login page
-                    console.log("Logged out automatically");
-                });
-            }
-
-            function resetTimer() {
-                clearTimeout(time);
-                time = setTimeout(logoutAction, timeoutLimit);
-            }
+        
+        const titles = {
+            'users': '<i class="fa-solid fa-users-gear mr-2"></i> ข้อมูลผู้ใช้งานระบบ',
+            'settings': '<i class="fa-solid fa-sliders mr-2"></i> ตั้งค่าระบบและองค์กร',
+            'budget': '<i class="fa-solid fa-sack-dollar mr-2"></i> ระบบจัดสรรงบประมาณ'
         };
-        // เปิดใช้งาน Auto logout
-        inactivityTime();
+        document.getElementById('page-title').innerHTML = titles[tabId];
+    }
 
-        function logout() {
-            Swal.fire({
-                title: 'ออกจากระบบ',
-                text: "คุณต้องการออกจากระบบใช่หรือไม่?",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#EF4444',
-                confirmButtonText: 'ออกจากระบบ'
-            }).then((result) => {
-                if(result.isConfirmed) {
-                    // นำทางไปหน้า Login
-                    document.body.innerHTML = "<h2 style='text-align:center; margin-top:20%; font-family:Sarabun'>Logged Out successfully.</h2>";
+    // --- 2. Profile Dropdown Logic ---
+    function toggleProfileMenu() {
+        document.getElementById('profileDropdown').classList.toggle('hidden');
+    }
+
+    // ปิด Dropdown เมื่อคลิกที่อื่น
+    window.onclick = function(event) {
+        if (!event.target.closest('.relative')) {
+            var dropdowns = document.getElementsByClassName("profile-dropdown");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (!openDropdown.classList.contains('hidden')) {
+                    openDropdown.classList.add('hidden');
                 }
-            });
+            }
         }
+    }
 
-        // Notification Toggle
-        function toggleNotifications() {
-            Swal.fire({
-                title: 'การแจ้งเตือน (3)',
-                html: `
-                    <div class="text-left text-sm">
-                        <div class="alert alert-info py-2">คำขอ REQ-FMD2567-W0045 ถูกส่งให้คุณตรวจสอบ</div>
-                        <div class="alert alert-warning py-2">คุณมี 2 คำขอที่รอการลงนามอนุมัติ</div>
-                        <div class="alert alert-success py-2">เพิ่มงบประมาณกองคลัง 1.5 ล้านบาท สำเร็จ</div>
-                    </div>
-                `,
-                showConfirmButton: false,
-                showCloseButton: true
-            });
+    // --- 3. Image Preview Logic ---
+    function previewImage(input, imgId) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById(imgId).src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
         }
+    }
 
-    </script>
-</body>
-</html>
+    // --- 4. Add User Form Logic ---
+    function checkPasswordStrength(pwd) {
+        const regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{6,}/;
+        const feedback = document.getElementById('pwdFeedback');
+        if(regex.test(pwd)) {
+            feedback.classList.remove('text-red-500');
+            feedback.classList.add('text-green-600');
+            feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> รหัสผ่านได้มาตรฐาน';
+        } else {
+            feedback.classList.remove('text-green-600');
+            feedback.classList.add('text-red-500');
+            feedback.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> อักษรพิมพ์ใหญ่, พิมพ์เล็ก, สัญลักษณ์, ตัวเลข, ขั้นต่ำ 6 หลัก';
+        }
+    }
+
+    function saveNewUser(e) {
+        e.preventDefault();
+        let formData = new FormData(e.target);
+        let userObj = Object.fromEntries(formData.entries());
+        
+        console.log("========== ข้อมูล User ใหม่ ==========");
+        console.log(JSON.stringify(userObj, null, 2));
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'สร้างบัญชีผู้ใช้สำเร็จ!',
+            text: 'ระบบได้บันทึกข้อมูลเรียบร้อย (ดูข้อมูล JSON ใน Console)'
+        }).then(() => {
+            bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+            e.target.reset();
+            const feedback = document.getElementById('pwdFeedback');
+            feedback.className = 'text-xs mt-1 text-red-500';
+            feedback.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> อักษรพิมพ์ใหญ่, พิมพ์เล็ก, สัญลักษณ์, ตัวเลข, ขั้นต่ำ 6 หลัก';
+        });
+    }
+
+    // --- 5. System Settings Logic ---
+    function saveOrgSettings(e) {
+        e.preventDefault();
+        Swal.fire('บันทึกสำเร็จ', 'อัปเดตข้อมูลระบบและโลโก้เรียบร้อยแล้ว', 'success');
+    }
+
+    function addFiscalYear() {
+        Swal.fire({
+            title: 'เพิ่มปีงบประมาณใหม่',
+            input: 'number',
+            inputPlaceholder: 'เช่น 2568',
+            showCancelButton: true,
+            confirmButtonText: 'เพิ่มปี',
+            cancelButtonText: 'ยกเลิก',
+            inputValidator: (value) => {
+                if (!value) return 'กรุณาระบุปีงบประมาณ!'
+            }
+        }).then((result) => {
+            if(result.isConfirmed) {
+                Swal.fire('สำเร็จ', `เพิ่มปี ${result.value} เรียบร้อยแล้ว`, 'success');
+            }
+        });
+    }
+
+    function setCurrentYear(year) {
+        Swal.fire({
+            title: `Set ปี ${year} เป็นปัจจุบัน?`,
+            text: "ระบบจะใช้ปีนี้ในการรันเลขที่อนุมัติคำขอ (เช่น 001/2568)",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#10B981',
+            confirmButtonText: 'ยืนยัน',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if(result.isConfirmed) {
+                Swal.fire('ตั้งค่าเรียบร้อย', `ระบบฐานข้อมูลเปลี่ยนไปใช้ปี ${year} เรียบร้อยแล้ว`, 'success');
+            }
+        });
+    }
+
+    // --- 6. Profile Methods ---
+    function changePassword(e) {
+        e.preventDefault();
+        Swal.fire('เปลี่ยนรหัสผ่านสำเร็จ', 'รหัสผ่านใหม่ของคุณถูกเข้ารหัสและอัปเดตเรียบร้อยแล้ว', 'success').then(() => {
+            e.target.reset();
+        });
+    }
+
+    function deleteSignature() {
+        Swal.fire({
+            title: 'ยืนยันการลบลายเซ็น?',
+            text: "หากลบแล้วคุณจะต้องอัปโหลดใหม่เพื่อใช้ในเอกสาร PDF",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            confirmButtonText: 'ใช่, ลบทิ้งเลย'
+        }).then((result) => {
+            if(result.isConfirmed) {
+                document.getElementById('sigPreview').src = '';
+                Swal.fire('ลบสำเร็จ', '', 'success');
+            }
+        });
+    }
+
+    // --- 7. Auto Logout (จำลอง) ---
+    function logout() {
+        Swal.fire({
+            title: 'ออกจากระบบ',
+            text: "คุณต้องการออกจากระบบใช่หรือไม่?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            confirmButtonText: 'ออกจากระบบ'
+        }).then((result) => {
+            if(result.isConfirmed) {
+                document.body.innerHTML = "<div class='flex items-center justify-center h-screen bg-gray-100'><h2 class='font-bold text-2xl text-blue-900'>ออกจากระบบสำเร็จแล้ว</h2></div>";
+            }
+        });
+    }
+
+    // Notification Toggle
+    function toggleNotifications() {
+        Swal.fire({
+            title: 'การแจ้งเตือน (3)',
+            html: `
+                <div class="text-left text-sm mt-3">
+                    <div class="alert alert-info py-2 rounded-xl">คำขอ REQ-FMD2567-W0045 ถูกส่งให้คุณตรวจสอบ</div>
+                    <div class="alert alert-warning py-2 rounded-xl">คุณมี 2 คำขอที่รอการลงนามอนุมัติ</div>
+                    <div class="alert alert-success py-2 rounded-xl">เพิ่มงบประมาณกองคลัง 1.5 ล้านบาท สำเร็จ</div>
+                </div>
+            `,
+            showConfirmButton: false,
+            showCloseButton: true
+        });
+    }
+</script>
