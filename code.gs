@@ -6,8 +6,8 @@
 
 // ตัวแปรตั้งค่า (Config) - ใส่ ID ของ Sheet, Folder และ Template
 const CONFIG = {
-  SPREADSHEET_ID: "1QQzdZX8fizK0QZqNl1SRUfP1NJgAzPCRVxvB2Bppqno", // แนะนำ: นำ ID ของ Google Sheet มาใส่ตรงนี้ (หรือปล่อยว่าง "" ถ้ารันสคริปต์จาก Sheet โดยตรง)
-  UPLOAD_FOLDER_ID: "1cnwFjfW3SuoPVKJJrlIsfdThEXzPX0sc", // ID โฟลเดอร์ Google Drive หลักสำหรับเก็บไฟล์/แฟ้มบุคคล ที่คุณแจ้งไว้
+  SPREADSHEET_ID: "1QQzdZX8fizK0QZqNl1SRUfP1NJgAzPCRVxvB2Bppqno", 
+  UPLOAD_FOLDER_ID: "1cnwFjfW3SuoPVKJJrlIsfdThEXzPX0sc", 
   
   // ID ของ Google Docs Template ที่เตรียมไว้
   TEMPLATE_6005_ID: "1aH7xknzFnjxM3xR3GGly5ck8he-lJhrY1ZCTiGiTL_g",
@@ -17,34 +17,33 @@ const CONFIG = {
 };
 
 /**
- * 1. ฟังก์ชัน doGet(e) - สำหรับ Render หน้าเว็บ HTML
- * รองรับการทำ Multi-page ผ่าน Query Parameter (let page = 'form_6005';)
+ * 1. ฟังก์ชัน doGet(e) - บังคับโหลด index.html เสมอ เพื่อเป็นโครงสร้างหลักของ SPA
  */
 function doGet(e) {
-  // ตรวจสอบตัวแปร e ป้องกัน Error กรณีที่กดปุ่ม "เรียกใช้" โดยตรงจาก Editor
-  let page = 'admin_management'; // ตั้งค่าหน้าเริ่มต้น
-  if (e && e.parameter && e.parameter.page) {
-    page = e.parameter.page;
-  }
-  
   try {
-    let template = HtmlService.createTemplateFromFile(page);
+    // บังคับโหลดไฟล์ index.html เท่านั้น ห้ามโหลดไฟล์ย่อยตรงๆ
+    let template = HtmlService.createTemplateFromFile('index');
     return template.evaluate()
       .setTitle('ระบบเบิกจ่ายค่าเช่าบ้านข้าราชการ')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   } catch (error) {
-    // กรณีหาไฟล์ HTML ไม่เจอ ให้แสดงหน้า Error
-    return HtmlService.createHtmlOutput('<h2><center>ไม่พบหน้าเว็บที่คุณต้องการ (Error 404)</center></h2><p><center>' + error.message + '</center></p>');
+    return HtmlService.createHtmlOutput('<h2><center>เกิดข้อผิดพลาดในการโหลดหน้าเว็บ</center></h2><p><center>' + error.message + '</center></p>');
   }
 }
 
 /**
  * 2. ฟังก์ชัน include(filename) 
- * สำหรับเรียกใช้ไฟล์ CSS/JS ย่อยเข้ามาในหน้า HTML หลัก (หากมีการแยกไฟล์)
+ * ดึงไฟล์ย่อยมาแสดงตรงกลางหน้า index พร้อมระบบป้องกันเว็บล่ม
  */
 function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+  try {
+    return HtmlService.createHtmlOutputFromFile(filename).getContent();
+  } catch (error) {
+    return '<div style="padding: 20px; background-color: #fee2e2; color: #dc2626; border: 2px dashed #f87171; border-radius: 8px; text-align: center; margin: 20px;">' +
+           '<h4><strong>⚠️ ไม่พบไฟล์: ' + filename + '.html</strong></h4>' +
+           '<p>กรุณาตรวจสอบว่าสร้างไฟล์นี้ไว้ที่แถบซ้ายมือแล้วหรือยัง</p></div>';
+  }
 }
 
 /**
@@ -54,14 +53,13 @@ function include(filename) {
  */
 
 /**
- * 3. บันทึกข้อมูลลง Google Sheets (รองรับฟอร์ม 6005, 6006, รายงาน ฯลฯ)
+ * 3. บันทึกข้อมูลลง Google Sheets
  */
 function saveDataToSheet(dataObject, sheetName) {
   try {
     let ss = CONFIG.SPREADSHEET_ID ? SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
     let sheet = ss.getSheetByName(sheetName);
     
-    // หากไม่มีชีตนี้ ให้สร้างใหม่พร้อมกำหนด Header อัตโนมัติ
     if (!sheet) {
       sheet = ss.insertSheet(sheetName);
       let headers = Object.keys(dataObject);
@@ -69,24 +67,20 @@ function saveDataToSheet(dataObject, sheetName) {
       sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#D0E2F3");
     }
     
-    // ดึง Header ปัจจุบันเพื่อจับคู่ Key ของ Object ให้ตรงคอลัมน์
     let headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     let rowData = [];
     
-    // บันทึก Timestamp อัตโนมัติถ้ามีคอลัมน์ Timestamp
     dataObject["Timestamp"] = new Date();
     if (headers.indexOf("Timestamp") === -1) {
-      headers.unshift("Timestamp"); // แทรกคอลัมน์ Timestamp ไปหน้าสุด
+      headers.unshift("Timestamp"); 
       sheet.insertColumnBefore(1);
       sheet.getRange(1, 1).setValue("Timestamp").setFontWeight("bold").setBackground("#D0E2F3");
     }
 
-    // จัดเรียงข้อมูลให้ตรงกับ Header
     for (let i = 0; i < headers.length; i++) {
       let key = headers[i];
       let value = dataObject[key] !== undefined ? dataObject[key] : "";
       
-      // ถ้าข้อมูลเป็น Array (เช่น Checkbox หลายอัน) ให้แปลงเป็น String ขั้นด้วย Comma
       if (Array.isArray(value)) {
         value = value.join(", ");
       }
@@ -108,18 +102,11 @@ function saveDataToSheet(dataObject, sheetName) {
  * ============================================================================
  */
 
-/**
- * 4. สร้างไฟล์ PDF จาก Google Docs Template โดยแทนที่ตัวแปร <<...>>
- * @param {String} formType - ประเภทฟอร์ม ("6005", "COMMITTEE", "REPORT", "6006")
- * @param {Object} dataObject - ข้อมูล JSON ที่ต้องการนำไปแทนที่ในเอกสาร
- * @param {String} subFolderName - ชื่อโฟลเดอร์แฟ้มบุคคล (เช่น ชื่อ-สกุล ผู้ยื่น)
- */
 function generatePDFFromTemplate(formType, dataObject, subFolderName) {
   try {
     let templateId = "";
     let fileNamePrefix = "";
     
-    // 4.1 เลือก Template ID ให้ตรงกับประเภทเอกสาร
     if (formType === "6005") {
       templateId = CONFIG.TEMPLATE_6005_ID;
       fileNamePrefix = "แบบขอรับสิทธิ_6005_";
@@ -138,7 +125,6 @@ function generatePDFFromTemplate(formType, dataObject, subFolderName) {
 
     if (!templateId) throw new Error("ยังไม่ได้กำหนด Template ID สำหรับฟอร์มนี้ในระบบ");
 
-    // 4.2 ค้นหาหรือสร้างโฟลเดอร์บุคคล
     let mainFolder = CONFIG.UPLOAD_FOLDER_ID ? DriveApp.getFolderById(CONFIG.UPLOAD_FOLDER_ID) : DriveApp.getRootFolder();
     let targetFolder = mainFolder;
     
@@ -151,39 +137,29 @@ function generatePDFFromTemplate(formType, dataObject, subFolderName) {
       }
     }
 
-    // 4.3 สร้างสำเนา (Copy) จาก Template ต้นฉบับ
     let timestamp = Utilities.formatDate(new Date(), "Asia/Bangkok", "yyyyMMdd_HHmmss");
     let newFileName = fileNamePrefix + (dataObject.fullName || "Unknown") + "_" + timestamp;
     let copiedFile = DriveApp.getFileById(templateId).makeCopy(newFileName, targetFolder);
     let copiedDocId = copiedFile.getId();
     
-    // 4.4 เปิดไฟล์สำเนาเพื่อเขียนข้อมูลลงไป
     let doc = DocumentApp.openById(copiedDocId);
     let body = doc.getBody();
 
-    // 4.5 วนลูปนำ Data Object ไปแทนที่ใน <<key>>
     for (let key in dataObject) {
       let placeholder = "<<" + key + ">>";
       let value = dataObject[key];
       
-      // จัดการกรณีค่าว่าง หรือเป็น Array
       if (value === undefined || value === null) value = "";
       if (Array.isArray(value)) value = value.join(", ");
       
-      // สั่งให้ Google Docs แทนที่คำ
       body.replaceText(placeholder, value);
     }
 
-    // ต้อง Save และ Close ก่อนเพื่อล้าง Buffer ให้ข้อมูลอัปเดตครบถ้วน
     doc.saveAndClose();
 
-    // 4.6 แปลงไฟล์ Docs นั้นเป็น PDF
     let pdfBlob = copiedFile.getAs("application/pdf");
     pdfBlob.setName(newFileName + ".pdf");
     let pdfFile = targetFolder.createFile(pdfBlob);
-
-    // *หมายเหตุ: ถ้าต้องการลบไฟล์ .doc ชั่วคราวออกเพื่อประหยัดพื้นที่ สามารถเปิดคอมเมนต์ด้านล่างได้
-    // copiedFile.setTrashed(true); 
 
     return { 
       status: 'success', 
@@ -204,9 +180,6 @@ function generatePDFFromTemplate(formType, dataObject, subFolderName) {
  * ============================================================================
  */
 
-/**
- * 5. อัปโหลดไฟล์ไปเก็บบน Google Drive (รองรับ Base64 ขนาดสูงสุดเกือบ 50MB)
- */
 function uploadFileToDrive(base64Data, fileName, subFolderName) {
   try {
     let splitBase = base64Data.split(',');
@@ -247,9 +220,6 @@ function uploadFileToDrive(base64Data, fileName, subFolderName) {
  * ============================================================================
  */
 
-/**
- * 6. ค้นหาและดึงข้อมูลจากแบบ 6005 อัตโนมัติ (เพื่อใช้ในหน้า 6006)
- */
 function fetch6005DataByApprovalNo(approvalNo) {
   try {
     let ss = CONFIG.SPREADSHEET_ID ? SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
@@ -286,9 +256,6 @@ function fetch6005DataByApprovalNo(approvalNo) {
   }
 }
 
-/**
- * 7. สร้างและรันเลขที่คำขออัตโนมัติ (ป้องกันปัญหา Concurrency เลขซ้ำด้วย LockService)
- */
 function generateRunningNumber(prefix, type) {
   let lock = LockService.getScriptLock();
   lock.waitLock(5000); 
