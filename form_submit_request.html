@@ -1,331 +1,255 @@
+<style>
+    /* CSS เฉพาะสำหรับ Checkbox ในหน้านี้ */
+    .checklist-item {
+        background: #ffffff;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .checklist-item:hover {
+        border-color: #3B82F6;
+        box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);
+    }
+    .checklist-item.confirmed {
+        border-color: #10B981; /* Green */
+        background-color: #F0FDF4;
+    }
+    .custom-checkbox {
+        width: 28px;
+        height: 28px;
+        border: 2px solid #9CA3AF;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        background: white;
+        transition: all 0.2s;
+    }
+    .checklist-item.confirmed .custom-checkbox {
+        background-color: #10B981;
+        border-color: #10B981;
+    }
+    .custom-checkbox i {
+        color: white;
+        font-size: 14px;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    .checklist-item.confirmed .custom-checkbox i {
+        opacity: 1;
+    }
+    @media (max-width: 768px) {
+        .checklist-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .checklist-item .btn { width: 100%; }
+    }
+</style>
 
-    <!-- Fonts: Sarabun -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome / Lucide Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- ================= เนื้อหาหลัก (ส่งคำขอ 6005) ================= -->
+<div class="flex flex-col items-center justify-center mt-4 mb-10">
+    <!-- Card สรุปข้อมูลตรงกลาง -->
+    <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-[800px] border-t-4 border-blue-800">
+        
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <h3 class="font-bold text-blue-900 text-2xl">ส่งคำขออนุมัติค่าเช่าบ้าน (แบบ 6005)</h3>
+            <p class="text-gray-500 mt-2 font-medium bg-yellow-50 text-yellow-700 py-2 px-4 rounded-lg inline-block border border-yellow-200">
+                <i class="fa-solid fa-circle-exclamation"></i> ตรวจสอบข้อมูลก่อนการส่งคำขอ หากถูกต้องโปรดกดยืนยันให้ครบถ้วน
+            </p>
+        </div>
 
-    <style>
-        :root {
-            --primary-blue: #1E3A8A;
-            --secondary-blue: #3B82F6;
-            --accent-yellow: #FBBF24;
-            --bg-gray: #E5E7EB;
-        }
-
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: var(--bg-gray);
-            color: #333;
-            overflow-x: hidden;
-        }
-
-        /* Sidebar Navigation Mockup */
-        #sidebar {
-            width: 280px;
-            height: 100vh;
-            position: fixed;
-            background: linear-gradient(180deg, var(--primary-blue) 0%, #1e40af 100%);
-            color: white;
-            z-index: 1000;
-        }
-
-        #main-content {
-            margin-left: 280px;
-            padding: 30px;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Checklist Card Styles */
-        .checklist-item {
-            background: #ffffff;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .checklist-item:hover {
-            border-color: var(--secondary-blue);
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);
-        }
-
-        /* State เมื่อถูกติ๊กยืนยัน */
-        .checklist-item.confirmed {
-            border-color: #10B981; /* Green */
-            background-color: #F0FDF4;
-        }
-
-        .custom-checkbox {
-            width: 28px;
-            height: 28px;
-            border: 2px solid #9CA3AF;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            background: white;
-            transition: all 0.2s;
-        }
-
-        .checklist-item.confirmed .custom-checkbox {
-            background-color: #10B981;
-            border-color: #10B981;
-        }
-
-        .custom-checkbox i {
-            color: white;
-            font-size: 14px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .checklist-item.confirmed .custom-checkbox i {
-            opacity: 1;
-        }
-
-        /* Buttons */
-        .btn-modern {
-            border-radius: 50px;
-            padding: 12px 25px;
-            font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .btn-modern:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        }
-
-        @media (max-width: 768px) {
-            #sidebar { display: none; }
-            #main-content { margin-left: 0; padding: 15px; }
-            .checklist-item { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .action-buttons { flex-direction: column; width: 100%; }
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Sidebar Navigation -->
-
-    <!-- Main Content -->
-    <main id="main-content">
-
-        <!-- Card สรุปข้อมูลตรงกลาง -->
-        <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-[800px]">
+        <!-- รายการที่ต้องยืนยัน -->
+        <div class="mb-8">
             
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                    <i class="fa-solid fa-clipboard-check"></i>
-                </div>
-                <h3 class="font-bold text-blue-900 text-2xl">ส่งคำขออนุมัติค่าเช่าบ้าน (แบบ 6005)</h3>
-                <p class="text-gray-500 mt-2 font-medium bg-yellow-50 text-yellow-700 py-2 px-4 rounded-lg inline-block border border-yellow-200">
-                    <i class="fa-solid fa-circle-exclamation"></i> ตรวจสอบข้อมูลก่อนการส่งคำขอ หากถูกต้องโปรดกดยืนยัน
-                </p>
-            </div>
-
-            <!-- รายการที่ต้องยืนยัน -->
-            <div class="mb-8">
-                
-                <!-- รายการที่ 1 -->
-                <div class="checklist-item" id="item_6005">
-                    <div class="flex items-center cursor-pointer" onclick="toggleConfirm('item_6005')">
-                        <div class="custom-checkbox"><i class="fa-solid fa-check"></i></div>
-                        <div>
-                            <h6 class="font-bold mb-0 text-lg">ฟังก์ชั่นหลัก “แบบขอรับค่าเช่าบ้าน (แบบ 6005)”</h6>
-                            <span class="text-sm text-gray-500">กรอกข้อมูลและแนบเอกสารครบถ้วนแล้ว</span>
-                        </div>
+            <!-- รายการที่ 1 -->
+            <div class="checklist-item" id="item_6005" onclick="toggleConfirmSubmit('item_6005')">
+                <div class="flex items-center w-full">
+                    <div class="custom-checkbox"><i class="fa-solid fa-check"></i></div>
+                    <div class="flex-grow">
+                        <h6 class="font-bold mb-0 text-lg">ฟังก์ชั่นหลัก “แบบขอรับค่าเช่าบ้าน (แบบ 6005)”</h6>
+                        <span class="text-sm text-gray-500">กรอกข้อมูลและแนบเอกสารครบถ้วนแล้ว</span>
                     </div>
-                    <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-4" onclick="editForm('form-6005', event)">
-                        <i class="fa-solid fa-pen-to-square"></i> แก้ไข
-                    </button>
                 </div>
-
-                <!-- รายการที่ 2 -->
-                <div class="checklist-item" id="item_committee">
-                    <div class="flex items-center cursor-pointer" onclick="toggleConfirm('item_committee')">
-                        <div class="custom-checkbox"><i class="fa-solid fa-check"></i></div>
-                        <div>
-                            <h6 class="font-bold mb-0 text-lg">ฟังก์ชั่นหลัก “การรับรองของคณะกรรมการ”</h6>
-                            <span class="text-sm text-gray-500">ตรวจสอบและลงนามคณะกรรมการเรียบร้อยแล้ว</span>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-4" onclick="editForm('form-committee', event)">
-                        <i class="fa-solid fa-pen-to-square"></i> แก้ไข
-                    </button>
-                </div>
-
-                <!-- รายการที่ 3 -->
-                <div class="checklist-item" id="item_report">
-                    <div class="flex items-center cursor-pointer" onclick="toggleConfirm('item_report')">
-                        <div class="custom-checkbox"><i class="fa-solid fa-check"></i></div>
-                        <div>
-                            <h6 class="font-bold mb-0 text-lg">ฟังก์ชั่นหลัก “แบบรายงานข้อมูล”</h6>
-                            <span class="text-sm text-gray-500">รายงานข้อมูลผู้ใช้สิทธิและคู่สมรสครบถ้วน</span>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-4" onclick="editForm('form-report', event)">
-                        <i class="fa-solid fa-pen-to-square"></i> แก้ไข
-                    </button>
-                </div>
-
-            </div>
-
-            <hr class="border-gray-200 mb-6">
-
-            <!-- Action Buttons -->
-            <div class="action-buttons flex justify-center gap-4">
-                <button type="button" class="btn btn-secondary bg-gray-500 border-0 btn-modern w-full md:w-auto" onclick="submitRequest('draft')">
-                    <i class="fa-solid fa-file-lines mr-2"></i> ร่างคำขออนุมัติค่าเช่าบ้านข้าราชการ
+                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-4 mt-2 md:mt-0 whitespace-nowrap" onclick="editFormSubmit('users', event)">
+                    <i class="fa-solid fa-pen-to-square"></i> แก้ไข
                 </button>
-                
-                <button type="button" class="btn btn-primary bg-blue-600 border-0 btn-modern w-full md:w-auto" onclick="submitRequest('submit')">
-                    <i class="fa-solid fa-paper-plane mr-2"></i> ส่งคำขอแบบขออนุมัติค่าเช่าบ้านข้าราชการ
+            </div>
+
+            <!-- รายการที่ 2 -->
+            <div class="checklist-item" id="item_committee" onclick="toggleConfirmSubmit('item_committee')">
+                <div class="flex items-center w-full">
+                    <div class="custom-checkbox"><i class="fa-solid fa-check"></i></div>
+                    <div class="flex-grow">
+                        <h6 class="font-bold mb-0 text-lg">ฟังก์ชั่นหลัก “การรับรองของคณะกรรมการ”</h6>
+                        <span class="text-sm text-gray-500">ตรวจสอบและลงนามคณะกรรมการเรียบร้อยแล้ว</span>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-4 mt-2 md:mt-0 whitespace-nowrap" onclick="editFormSubmit('committee', event)">
+                    <i class="fa-solid fa-pen-to-square"></i> แก้ไข
+                </button>
+            </div>
+
+            <!-- รายการที่ 3 -->
+            <div class="checklist-item" id="item_report" onclick="toggleConfirmSubmit('item_report')">
+                <div class="flex items-center w-full">
+                    <div class="custom-checkbox"><i class="fa-solid fa-check"></i></div>
+                    <div class="flex-grow">
+                        <h6 class="font-bold mb-0 text-lg">ฟังก์ชั่นหลัก “แบบรายงานข้อมูล”</h6>
+                        <span class="text-sm text-gray-500">รายงานข้อมูลผู้ใช้สิทธิและคู่สมรสครบถ้วน</span>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-4 mt-2 md:mt-0 whitespace-nowrap" onclick="editFormSubmit('report', event)">
+                    <i class="fa-solid fa-pen-to-square"></i> แก้ไข
                 </button>
             </div>
 
         </div>
 
-    </main>
+        <hr class="border-gray-200 mb-6">
 
-    <script>
-        // จำลองเลขรัน (ในระบบจริงจะดึงจากฐานข้อมูล Google Apps Script)
-        let runningReqCount = 1;
-        let runningDraftCount = 1;
-
-        // --- 1. Toggle Checkbox Logic ---
-        function toggleConfirm(itemId) {
-            const el = document.getElementById(itemId);
-            el.classList.toggle('confirmed');
-        }
-
-        // --- 2. Edit Form Navigation ---
-        function editForm(formName, event) {
-            // หยุดไม่ให้การคลิกปุ่ม ทะลุไปโดนฟังก์ชัน toggleConfirm ด้านหลัง
-            event.stopPropagation();
+        <!-- Action Buttons -->
+        <div class="flex justify-center gap-4 flex-wrap">
+            <button type="button" class="btn btn-secondary bg-gray-500 text-white border-0 rounded-pill px-5 py-3 font-bold shadow-sm w-full md:w-auto hover:bg-gray-600 transition" onclick="submitRequestFinal('draft')">
+                <i class="fa-solid fa-file-lines mr-2"></i> บันทึกเป็นร่างคำขอ (Draft)
+            </button>
             
-            Swal.fire({
-                title: 'ต้องการแก้ไขข้อมูล?',
-                text: "ระบบจะนำทางคุณกลับไปยังฟอร์มเพื่อแก้ไขข้อมูล",
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonText: 'ไปหน้าแก้ไข',
-                cancelButtonText: 'ยกเลิก'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Logic สำหรับนำทางใน SPA (อ้างอิงจาก index.html ตัวหลัก)
-                    console.log(`Navigating to: ${formName}`);
-                    Swal.fire('นำทางสำเร็จ', `ระบบจำลองพากลับไปที่หน้า ${formName} แล้ว (เมื่อแก้ไขเสร็จให้กดบันทึกกลับมาที่นี่)`, 'success');
-                    
-                    // หากรวมกับไฟล์หลัก จะใช้โค้ด: navigate(formName);
-                }
-            });
-        }
+            <button type="button" class="btn btn-primary bg-blue-600 text-white border-0 rounded-pill px-5 py-3 font-bold shadow-lg w-full md:w-auto hover:bg-blue-700 transition" onclick="submitRequestFinal('submit')">
+                <i class="fa-solid fa-paper-plane mr-2"></i> ยืนยันส่งคำขอแบบ 6005
+            </button>
+        </div>
 
-        // --- 3. Submit Logic & Document Number Generation ---
-        function submitRequest(actionType) {
-            // ดึงสถานะการเช็คกล่อง
-            const is6005Checked = document.getElementById('item_6005').classList.contains('confirmed');
-            const isComChecked = document.getElementById('item_committee').classList.contains('confirmed');
-            const isRepChecked = document.getElementById('item_report').classList.contains('confirmed');
+    </div>
+</div>
 
-            // เงื่อนไข: ถ้าจะส่งคำขอจริง แต่กดยืนยันไม่ครบ ให้ฟ้องแจ้งเตือน
-            if (actionType === 'submit') {
-                if (!is6005Checked || !isComChecked || !isRepChecked) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'ข้อมูลยังไม่สมบูรณ์',
-                        text: 'กรุณาตรวจสอบข้อมูล และกดยืนยันให้ครบทั้ง 3 รายการก่อนส่งคำขอครับ',
-                        confirmButtonColor: '#1E3A8A'
-                    });
-                    return;
+<script>
+    // จำลองเลขรันเบื้องต้น
+    let reqSubmitRunningCount = 1;
+    let reqDraftRunningCount = 1;
+
+    // --- 1. Toggle Checkbox Logic ---
+    function toggleConfirmSubmit(itemId) {
+        const el = document.getElementById(itemId);
+        el.classList.toggle('confirmed');
+    }
+
+    // --- 2. Edit Form Navigation ---
+    function editFormSubmit(tabId, event) {
+        // หยุดไม่ให้การคลิกปุ่ม ทะลุไปโดนฟังก์ชัน toggleConfirmSubmit ด้านหลัง
+        event.stopPropagation();
+        
+        Swal.fire({
+            title: 'ต้องการแก้ไขข้อมูล?',
+            text: "ระบบจะนำทางคุณกลับไปยังฟอร์มเพื่อแก้ไขข้อมูล",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#3B82F6',
+            confirmButtonText: 'ไปหน้าแก้ไข',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // เรียกใช้ฟังก์ชัน switchTab ของไฟล์ index.html (ถ้ามี)
+                if(typeof switchTab === 'function') {
+                    switchTab(tabId);
+                } else {
+                    Swal.fire('นำทางสำเร็จ', `ระบบจำลองพากลับไปที่หน้า ${tabId} (เนื่องจากรันแยกไฟล์)`, 'success');
                 }
             }
+        });
+    }
 
-            // คำนวณปี พ.ศ. ปัจจุบัน
-            const currentYear = new Date().getFullYear() + 543;
-            
-            // เตรียมตัวแปรเลขที่
-            let prefix = "";
-            let generatedNumber = "";
-            let formattedRunning = "";
+    // --- 3. Submit Logic & Backend Connection ---
+    function submitRequestFinal(actionType) {
+        // ดึงสถานะการเช็คกล่อง
+        const is6005Checked = document.getElementById('item_6005').classList.contains('confirmed');
+        const isComChecked = document.getElementById('item_committee').classList.contains('confirmed');
+        const isRepChecked = document.getElementById('item_report').classList.contains('confirmed');
 
-            if (actionType === 'draft') {
-                // ร่างคำขอ (RED)
-                prefix = "RED";
-                formattedRunning = String(runningDraftCount).padStart(5, '0'); // R00001
-                generatedNumber = `${prefix}-FMD${currentYear}-R${formattedRunning}`;
-                runningDraftCount++; // เพิ่มเลขรอไว้ครั้งถัดไป
-                
+        // เงื่อนไข: ถ้าจะส่งคำขอจริง แต่กดยืนยันไม่ครบ ให้ฟ้องแจ้งเตือน
+        if (actionType === 'submit') {
+            if (!is6005Checked || !isComChecked || !isRepChecked) {
                 Swal.fire({
-                    icon: 'success',
-                    title: 'บันทึกร่างคำขอสำเร็จ',
-                    html: `ระบบได้บันทึกข้อมูลเป็นร่างคำขอเรียบร้อยแล้ว<br><br><b>เลขที่ร่างคำขอ:</b> <span class="text-xl text-red-500 font-bold">${generatedNumber}</span>`,
+                    icon: 'warning',
+                    title: 'ข้อมูลยังไม่สมบูรณ์',
+                    text: 'กรุณาตรวจสอบข้อมูล และคลิกยืนยันให้ครบทั้ง 3 รายการด้านบนก่อนส่งคำขอครับ',
                     confirmButtonColor: '#1E3A8A'
-                }).then(() => {
-                    // นำทางไปหน้ารายงาน
-                    goToReportPage();
                 });
+                return;
+            }
+        }
 
-            } else if (actionType === 'submit') {
-                // ส่งคำขอจริง (REQ)
-                Swal.fire({
-                    title: 'ยืนยันการส่งคำขอ?',
-                    text: "คุณตรวจสอบข้อมูลครบถ้วนแล้ว ต้องการส่งคำขอเพื่อรอการอนุมัติใช่หรือไม่?",
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#10B981',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'ใช่, ส่งคำขอ',
-                    cancelButtonText: 'ยกเลิก'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        prefix = "REQ";
-                        formattedRunning = String(runningReqCount).padStart(5, '0'); // R00001
-                        generatedNumber = `${prefix}-FMD${currentYear}-R${formattedRunning}`;
-                        runningReqCount++;
+        const actionText = actionType === 'submit' ? 'ส่งคำขออนุมัติ' : 'บันทึกร่างคำขอ';
+        const actionColor = actionType === 'submit' ? '#10B981' : '#6B7280';
 
+        Swal.fire({
+            title: `ยืนยันการ${actionText}?`,
+            text: actionType === 'submit' ? "คำขอของคุณจะถูกส่งไปให้ผู้บังคับบัญชาตรวจสอบ" : "บันทึกข้อมูลเก็บไว้เพื่อแก้ไขภายหลัง",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: actionColor,
+            cancelButtonColor: '#EF4444',
+            confirmButtonText: `ใช่, ${actionText}`,
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                
+                // คำนวณปี พ.ศ. ปัจจุบัน สำหรับสร้างเลขที่ชั่วคราวให้ User ดู
+                const currentYear = new Date().getFullYear() + 543;
+                let generatedNumber = "";
+                
+                if (actionType === 'draft') {
+                    generatedNumber = `RED-FMD${currentYear}-R${String(reqDraftRunningCount).padStart(5, '0')}`;
+                    reqDraftRunningCount++;
+                } else {
+                    generatedNumber = `REQ-FMD${currentYear}-R${String(reqSubmitRunningCount).padStart(5, '0')}`;
+                    reqSubmitRunningCount++;
+                }
+
+                // เตรียมข้อมูลที่จะส่งไป Backend
+                const payload = {
+                    action: actionType,
+                    tempId: generatedNumber,
+                    timestamp: new Date().toISOString()
+                };
+
+                // แสดง Loading
+                Swal.fire({ title: 'กำลังดำเนินการ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+                // จำลองการส่งข้อมูลไปที่ Backend (เปลี่ยนเป็นเรียก code.gs ได้ในอนาคต)
+                // google.script.run.withSuccessHandler(...).submitFinalApproval(payload);
+                
+                // ใช้ setTimeout จำลองการโหลดของเซิร์ฟเวอร์
+                setTimeout(() => {
+                    if (actionType === 'draft') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'บันทึกร่างคำขอสำเร็จ',
+                            html: `ระบบได้บันทึกข้อมูลเป็นร่างคำขอเรียบร้อยแล้ว<br><br><b>เลขที่อ้างอิง:</b> <span class="text-xl text-gray-600 font-bold">${generatedNumber}</span>`,
+                            confirmButtonColor: '#1E3A8A'
+                        });
+                    } else {
                         Swal.fire({
                             icon: 'success',
                             title: 'ส่งคำขอสำเร็จ!',
-                            html: `คำขอของคุณถูกส่งเข้าสู่ระบบเรียบร้อยแล้ว<br><br><b>เลขที่คำขอ:</b> <span class="text-xl text-green-600 font-bold">${generatedNumber}</span>`,
+                            html: `คำขอของคุณถูกส่งเข้าสู่ระบบรอการอนุมัติเรียบร้อยแล้ว<br><br><b>เลขที่คำขอ:</b> <span class="text-xl text-green-600 font-bold">${generatedNumber}</span>`,
                             confirmButtonColor: '#1E3A8A'
                         }).then(() => {
-                            // นำทางไปหน้ารายงาน
-                            goToReportPage();
+                            // สั่งให้กลับหน้าแรกหรือหน้ารายการคำขอ (อ้างอิงฟังก์ชันใน index.html)
+                            if(typeof switchTab === 'function') {
+                                // สมมติว่ามีหน้า dashboard
+                                // switchTab('dashboard'); 
+                            }
                         });
                     }
-                });
+                }, 1500); // ดีเลย์ 1.5 วินาที
             }
-        }
-
-        function goToReportPage() {
-            console.log("Navigating to Report Page...");
-            // ในระบบจริง จะใช้ฟังก์ชันเปลี่ยนหน้า
-            // navigate('report-all');
-        }
-    </script>
-</body>
-</html>
+        });
+    }
+</script>
